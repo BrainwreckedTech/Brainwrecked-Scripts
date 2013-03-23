@@ -1,0 +1,21 @@
+# A program to temporarily modify an IPTables firewall.
+# Port list is gathered from /etc/iptmod
+
+# Usage: iptmod [ A | D ] [ip-list]
+#
+#   A or D   Add or Delete rules
+#
+#   ip-list   Comma-seperated list of IPs to open ports for
+
+IPT=iptables
+
+for ADDR in $2;  do
+  for PORT in `cat /etc/iptmod`; do
+    for PROT in tcp udp; do
+      TBL=`echo $PROT | tr 'tucdp' 'TUCDP'`
+      $IPT -$1 $TBL -s $ADDR -i eth1 -p $PROT -m $PROT --dport $PORT -j ACCEPT
+    done
+    [[ $1 == A ]] && echo "IP address $ADDR now has access to port(s) $PORT"
+    [[ $1 == D ]] && echo "IP address $ADDR now denied access to port(s) $PORT"
+  done
+done 
