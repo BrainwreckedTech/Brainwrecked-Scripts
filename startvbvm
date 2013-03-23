@@ -1,0 +1,40 @@
+# A program to use VMs in VirtualBox as presets and dynamically load
+# storage devices into them.  Useful when you use VirtualBox across
+# machines of varying capabilities. 
+
+# Usage: startvbvm [preset] [vm-name]
+#
+#   preset    Any kind of label you want to use.  Script will look for
+#             ~/.startvbvm/[preset] for a list of virtual disks to attach 
+#
+#   vm-name   Name of VM to search for.  Can be partial but must be unique.
+
+function get_vbvmid () {
+  VBoxManage list vms | grep $1 | cut -d{ -f2 | cut -b1-36
+}
+
+function attach () {
+  VBoxManage storageattach $1 --storagectl $2 --port $3 --type $4 --medium $5
+}
+
+function detach () {
+  VBoxManage storageattach $1 --storagectl $2 --port $3 --medium none
+}
+
+VBVMID=$(get_vbvmid $2) && count=-1
+
+while IFS= read -r vdfile; do
+  count=$(($count + 1))
+  attach $VBVMID SATA $count hdd $vdfile
+  echo "SATA port $count $vdfile"
+done < ~/.startvbvm/$1
+
+VBoxManage startvm $VBVMID
+
+echo "Waiting for process VirtualBox to terminate (5 sec check)..."
+while [ "`pgrep -l VirtualBox`" != "" ]; do sleep 5; done
+
+for (( p=0; p<=count; p++ )); do
+  detach $VBVMID SATA $p;
+  echo "SATA port $p detached"
+done
