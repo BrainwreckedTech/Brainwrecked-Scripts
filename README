@@ -1,4 +1,10 @@
 This repository is just a collection of scripts that I've come up with 
-over time that I think are useful enough to share.
+over time that I think are useful enough to share. All scripts in this 
+repository are licensed under the GPL v3 unless otherwise stated.
 
-All scripts in this repository are licensed under the GPL v3.
+ddi		Dump Disk Info
+gua		Guided User Add
+iptmod		Changes firewall rules
+myip4		Gets IP addresses (local and public)
+sendEmail	Send email from CLI (Brandon Zehm, GPL v2)
+startvbvm	Attach storage to a VB VM, run, then detach storage
