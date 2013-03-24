@@ -1,0 +1,33 @@
+# GUA - Guided User Add - Help in setting up users on a new system.
+#
+# NOTE: It is best to have ALL intended software installed before 
+# running this script.  This script will skip right over any groups not 
+# found in /etc/group.
+
+read -p "Enter name of user: " NEWUSER
+CREATEHOME=
+while [ ! `echo $CREATEHOME | grep [YNyn] >> /dev/null && echo $?` ]; do
+  echo -ne "\r                                   \r"
+  read -p "Create home directory? [y/n] " -n1 CREATEHOME
+done
+echo ""
+[[ $CREATEHOME == y || $CREATEHOME == Y ]] && HOMEOPTION=-m || HOMEOPTION=-M
+
+echo -ne "\r"
+read -p "Enter user id for $NEWUSER: " USERID
+
+USERGROUPS[0]=junk
+for GROUP in audio adbusers camera cdemu disk floppy games kvm locate lp network networkmanager optical power ssh storage sys thinkpad uucp vboxusers vmware video wheel wireshark; do
+  if [ `cat /etc/group | grep $GROUP >> /dev/null && echo $?` ]; then
+    ANSWER=
+    while [ ! `echo $ANSWER | grep [YNyn] >> /dev/null && echo $?` ]; do
+      echo -ne "\r                                        \r"
+      read -p "Add user to group ${GROUP}? [y/n] " -n1 ANSWER
+    done
+    echo
+    [[ $ANSWER == y || $ANSWER == Y ]] && USERGROUPS=("${USERGROUPS[@]}" "$GROUP")
+  else
+    echo "Group $GROUP is not defined in /etc/group."
+  fi
+done
+useradd $HOMEOPTION -g users -G `echo ${USERGROUPS[@]:1:${#USERGROUPS[@]}} | tr ' ' ','` $NEWUSER -u $USERID
