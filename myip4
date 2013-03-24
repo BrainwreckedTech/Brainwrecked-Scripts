@@ -1,0 +1,28 @@
+# This script lists the ip addresses you are currently using.
+# If I were super-elitist, I could just say the code below is the 
+# documentation.  That's not me.  The piping sequence is long and scary.
+#
+# 1) query ip addr for info on local networking
+# 2) only get the lines containing inet
+# 3) exclude the line that has the local loopback
+# 4) get rid of leading white space
+# 5) discard the broadcast address
+# 6) discard the netmask
+# 7) print only the fifth and second fields, in that order
+#
+# This script also accepts one switch of either:
+#   -a   List all (internal and public) IP addresses
+#   -i   List only internal IP addresses
+#   -p   List only public IP address
+
+switch="$1" && [[ "$switch" == "" ]] && switch='-a'
+
+if [ $switch == -i -o $switch == -a ]; then
+  ip addr  | grep 'inet ' | grep -v 'host lo' | sed 's/ *inet/inet/g' | 
+  sed 's/brd [0-9]*\.[0-9]*\.[0-9]*.[0-9]* //g' | sed 's/\/[0-9]*//g' | 
+  awk '{print$5,$2}'
+fi
+
+if [ $switch == -p -o $switch == -a ]; then
+  echo "public `curl ifconfig.me 2> /dev/null`"
+fi
