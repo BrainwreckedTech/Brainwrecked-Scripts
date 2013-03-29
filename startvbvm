@@ -58,13 +58,14 @@ while [ "`lsmod | grep vboxdrv`" == "" ]; do
   sudo modprobe vboxdrv
 done
 
+count=-1 
+
 while IFS= read -r vdfile; do
   count=$(($count + 1))
   attach $VBVMID SATA $count hdd $vdfile
   echo "SATA port $count $vdfile"
 done < ~/.startvbvm/$1
 
-count=-1 
 VBoxManage startvm $VBVMID
 
 echo "Waiting for process VirtualBox to terminate (5 sec check)..."
