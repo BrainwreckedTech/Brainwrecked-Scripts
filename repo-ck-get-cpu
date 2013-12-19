@@ -1,0 +1,2 @@
+#!/bin/bash
+gcc -c -Q -march=native --help=target | grep march

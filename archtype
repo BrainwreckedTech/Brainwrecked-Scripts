@@ -1,0 +1,7 @@
+if [ `which gcc 2> /dev/null` ]; then
+  gcc -c -Q -march=native --help=target | grep march | sed 's/[ \t]*//g' | cut -d= -f2 | \
+  sed 's/corei7/nahelem/g;s/corei7-avx-i/sandybridge/g;s/core-avx2/haswell/g;s/pentium4/p4/g;s/nocona/p4/g;s/pentium-m/pentm/g' | \
+  sed 's/athlon.*/kx/g;s/k8-sse3/kx/g;s/amdfam10/k10/g;s/btver1/bobcat/g;s/bdver1/bulldozer/g;s/bdver2/piledriver/g;'
+else
+  echo "You need to install gcc."
+fi

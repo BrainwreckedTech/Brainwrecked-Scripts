@@ -1,0 +1,12 @@
+#!/bin/bash
+arch=`/scr/archtype -ck`
+kuse=`uname -r | cut -d\  -f2`
+
+echo $kuse in use.
+
+if [ `echo $kuse | grep 'ck'` ]; then
+  echo "`pacman -Q linux-ck-$arch | cut -d\  -f2`-ck installed."
+else
+  echo "`pacman -Q linux | cut -d\  -f2` installed."
+fi
+
