@@ -1,0 +1,17 @@
+#!/bin/bash
+
+[[ -z "$1" ]] && echo No file specified  && exit 1
+[[ ! -f "$1" ]] && echo The file $1 does not exist && exit 1
+
+[[ -z "$2" ]] && echo Max icon size not specified && exit 1
+[[ "$2" -lt 16 || "$2" -gt 256 ]] && echo Invalid icon size \(16,32,48,64,96,128,256\) specified && exit 1
+ 
+cmd="convert $1  -bordercolor white -border 0 "
+
+for size in 16 32 48 64 96 128 256; do
+  [[ ! $size -gt $2 ]] && cmd+="\( -clone 0 -resize ${size}x${size} \) "
+done
+
+cmd+="-delete 0 -alpha off -colors 256 favicon.ico"
+
+echo $cmd
