@@ -1,0 +1,13 @@
+# This script automates system updates in Arch Linux
+
+# Call the update-reflector script to get the best mirrors
+/usr/bin/sudo /scr/update-reflector "United States"
+
+# Build command to execute
+cmd="/usr/bin/sudo /usr/bin/pacman -Syu"
+
+# If local shared cache exists, use it
+[[ -d /mnt/nfs/pacman/pkg ]] && cmd+=" --cachedir /mnt/nfs/pacman/pkg"
+
+# Execute command
+eval $cmd

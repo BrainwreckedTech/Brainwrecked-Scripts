@@ -1,0 +1,5 @@
+# Script to automate refreshing the mirror list in Arch Linux
+
+echo 'Determining best mirrors...'
+/usr/bin/reflector -l 5 -c "$1" --sort rate --save /etc/pacman.d/mirrorlist
+cat /etc/pacman.d/mirrorlist | grep ^Server 
