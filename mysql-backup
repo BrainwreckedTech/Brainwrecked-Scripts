@@ -5,21 +5,21 @@ bdir="/srv/backup/mysql"
 
 rm ${bdir}/*.sql
 
-mysqldump -td -u${user} -p${pswd} --all-databases > ${bdir}/ALL-DTBS.sql
+/usr/bin/mysqldump -td -u${user} -p${pswd} --all-databases > ${bdir}/ALL-DTBS.sql
 
-dcmd="mysql -u${user} -p${pswd} -sre 'show databases;' |
+dcmd="/usr/bin/mysql -u${user} -p${pswd} -sre 'show databases;' |
   egrep -vi 'information_schema|performance_schema'"
 for dtbs in `eval ${dcmd}`; do
-  tcmd="mysql -u${user} -p${pswd} ${dtbs} -sre 'show tables;'"
+  tcmd="/usr/bin/mysql -u${user} -p${pswd} ${dtbs} -sre 'show tables;'"
   for tabl in `eval ${tcmd}`; do
     echo ${dtbs}.${tabl}
-    mysqldump --skip-extended-insert -u${user} -p${pswd} ${dtbs} ${tabl} > ${bdir}/${dtbs}.${tabl}.sql
+    /usr/bin/mysqldump --skip-extended-insert -u${user} -p${pswd} ${dtbs} ${tabl} > ${bdir}/${dtbs}.${tabl}.sql
   done
 done
 
 #exit 0
 
 cd ${bdir}
-git add -A *.sql
-git commit -am "Backup For `date +%Y-%m-%d_%H:%M:%S`"
-git push -u origin master
+/usr/bin/git add -A *.sql
+/usr/bin/git commit -am "Backup For `date +%Y-%m-%d_%H:%M:%S`"
+/usr/bin/git push -u origin master
