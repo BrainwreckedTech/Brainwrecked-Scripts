@@ -1,0 +1,25 @@
+#!/bin/bash
+user="${1}"
+pswd="${2}"
+bdir="/srv/backup/mysql"
+
+rm ${bdir}/*.sql
+
+mysqldump -td -u${user} -p${pswd} --all-databases > ${bdir}/ALL-DTBS.sql
+
+dcmd="mysql -u${user} -p${pswd} -sre 'show databases;' |
+  egrep -vi 'information_schema|performance_schema'"
+for dtbs in `eval ${dcmd}`; do
+  tcmd="mysql -u${user} -p${pswd} ${dtbs} -sre 'show tables;'"
+  for tabl in `eval ${tcmd}`; do
+    echo ${dtbs}.${tabl}
+    mysqldump --skip-extended-insert -u${user} -p${pswd} ${dtbs} ${tabl} > ${bdir}/${dtbs}.${tabl}.sql
+  done
+done
+
+#exit 0
+
+cd ${bdir}
+git add -A *.sql
+git commit -am "Backup For `date +%Y-%m-%d_%H:%M:%S`"
+git push -u origin master
