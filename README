@@ -18,6 +18,9 @@ iptmod			Changes firewall rules
 
 myip4			Gets IP addresses (local and public)
 
+mysql-backup            Backup a MySQL database with individual files
+                        for each table
+
 pms-list-all-minus-base	Pacman Shortcut: List all explicitly installed
 			packages except those in base and base-devel
 
