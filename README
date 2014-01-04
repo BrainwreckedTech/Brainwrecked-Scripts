@@ -6,6 +6,8 @@ repository are licensed under the GPL v3 unless otherwise stated.
 
 archtype		List system CPU architecture, reported by GCC
 
+backup-root-rsync	Backup root partition to another PC via rsync
+
 convert2ico		Converts an image to .ico format
 
 cur-linux-ver		Prints current linux kernel version

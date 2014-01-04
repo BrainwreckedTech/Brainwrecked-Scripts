@@ -1,0 +1,20 @@
+#!/bin/bash
+host=$1
+user=$2
+rdir=/backup/roots/${HOSTNAME}
+sshc="ssh -i /home/${user}/.ssh/id_ecdsa"
+ldir="`eval ${sshc} ${user}@${host} 'ls ${rdir} -1r|head -1'`"  
+[[ "$ldir" != "" ]] && ldst="--link-dest=${rdir}/${ldir}"
+xcld="--exclude swapfile --exclude .thumbnails --exclude .cache"
+rsop="${ldst} ${xcld} --delete-excluded --progress -xae"
+
+echo "Host: ${host}"
+echo "User: ${user}"
+echo "RDir: ${rdir}"
+echo "SSHC: ${sshc}"
+echo "LDir: ${ldir}"
+echo "LDst: ${ldst}"
+echo "Xcld: ${xcld}"
+echo "RSOp: ${rsop}"
+
+sudo rsync ${rsop} "${sshc}" / ${2}@${1}:${rdir}/`date +%F`
