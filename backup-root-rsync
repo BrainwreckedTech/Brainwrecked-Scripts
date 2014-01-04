@@ -1,20 +1,38 @@
 #!/bin/bash
-host=$1
-user=$2
-rdir=/backup/roots/${HOSTNAME}
+
+[[ $EUID != 0 ]] && echo "Must have super user privileges." && exit 1
+
+host="$1"
+user="$2"
+rdir="$3"
+svcs="$4"
+
 sshc="ssh -i /home/${user}/.ssh/id_ecdsa"
+
 ldir="`eval ${sshc} ${user}@${host} 'ls ${rdir} -1r|head -1'`"  
 [[ "$ldir" != "" ]] && ldst="--link-dest=${rdir}/${ldir}"
-xcld="--exclude swapfile --exclude .thumbnails --exclude .cache"
-rsop="${ldst} ${xcld} --delete-excluded --progress -xae"
 
-echo "Host: ${host}"
-echo "User: ${user}"
-echo "RDir: ${rdir}"
-echo "SSHC: ${sshc}"
-echo "LDir: ${ldir}"
-echo "LDst: ${ldst}"
-echo "Xcld: ${xcld}"
-echo "RSOp: ${rsop}"
+xcld+="--exclude swapfile "
+xcld+="--exclude .thumbnails "
+xcld+="--exclude .cache "
+xcld+="--exclude /var/cache/pacman "
+xcld+="--exclude /srv/build/x86_64/paul "
+xcld+="--exclude /srv/build/i686/paul "
 
-sudo rsync ${rsop} "${sshc}" / ${2}@${1}:${rdir}/`date +%F`
+rsop="${ldst} ${xcld} --delete-excluded --progress -xaze"
+
+for binds in `cat /etc/fstab | grep bind | sed 's/\t/ /g' | sed 's/  */ /g' | cut -d\  -f2`; do
+  echo Unbinding ${binds}...
+  umount ${binds}
+done
+
+[[ "${svcs}" != "none" ]] && echo "Stopping ${svcs}..." && systemctl stop ${svcs}
+
+echo "Rsyncing to ${user}@${host}..."
+rsync ${rsop} "${sshc}" / ${2}@${1}:${rdir}/`date +%F`
+
+[[ "${svcs}" != "none" ]] && echo "Restarting ${svcs}..." && systemctl start ${svcs}
+
+echo "Rebinding mounts..." && mount -a
+
+exit 0
