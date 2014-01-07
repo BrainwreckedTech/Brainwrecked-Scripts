@@ -10,6 +10,7 @@ svcs="$4"
 sshc="ssh -i /home/${user}/.ssh/id_ecdsa"
 
 ldir="`eval ${sshc} ${user}@${host} 'ls ${rdir} -1r|head -1'`"  
+[ "$ldir" == "`date +%F`" ] && { [ -t 1 ] && { echo "Already backed up for today"; exit 1; } || exit 1; }
 [[ "$ldir" != "" ]] && ldst="--link-dest=${rdir}/${ldir}"
 
 xcld+="--exclude swapfile "
@@ -19,20 +20,22 @@ xcld+="--exclude /var/cache/pacman "
 xcld+="--exclude /srv/build/x86_64/paul "
 xcld+="--exclude /srv/build/i686/paul "
 
-rsop="${ldst} ${xcld} --delete-excluded --progress -xaze"
+[ -t 1 ] && rsop="${ldst} ${xcld} --progress -xaze" 
+[ -t 1 ] || rsop="${ldst} ${xcld} -qxaze" 
 
-for binds in `cat /etc/fstab | grep bind | sed 's/\t/ /g' | sed 's/  */ /g' | cut -d\  -f2`; do
-  echo Unbinding ${binds}...
-  umount ${binds}
+for binds in `/usr/bin/cat /etc/fstab | /usr/bin/grep bind | /usr/bin/sed 's/\t/ /g' | /usr/bin/sed 's/  */ /g' | /usr/bin/cut -d\  -f2`; do
+  [ -t 1 ] && echo Unbinding ${binds}...
+  /usr/bin/umount ${binds}
 done
 
-[[ "${svcs}" != "none" ]] && echo "Stopping ${svcs}..." && systemctl stop ${svcs}
+[ "${svcs}" != "none" ] && { [ -t 1 ] && echo "Stopping ${svcs}..."; } && /usr/bin/systemctl stop ${svcs}
 
-echo "Rsyncing to ${user}@${host}..."
-rsync ${rsop} "${sshc}" / ${2}@${1}:${rdir}/`date +%F`
+[ -t 1 ] && echo "Rsyncing to ${user}@${host}..."
+/usr/bin/rsync ${rsop} "${sshc}" / ${2}@${1}:${rdir}/`date +%F`
 
-[[ "${svcs}" != "none" ]] && echo "Restarting ${svcs}..." && systemctl start ${svcs}
+[ "${svcs}" != "none" ] && { [ -t 1 ] && echo "Restarting ${svcs}..."; } && /usr/bin/systemctl start ${svcs}
 
-echo "Rebinding mounts..." && mount -a
+[ -t 1 ] && echo "Rebinding mounts..."
+/usr/bin/mount -a
 
 exit 0
