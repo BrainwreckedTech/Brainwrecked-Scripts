@@ -1,0 +1,32 @@
+#!/bin/bash
+
+show_help () {
+cat <<END_OF_SHOW_HELP
+$0 [ -h ] [ -b <BRANCH> ] [ -d <DIRECTORY> ] [ -m <MESSAGE> ]
+
+  -h  Show this help
+  -d  Change into <DIRECTORY> (default: current working directory)
+  -b  Change into and push <BRANCH> (default: master)
+  -m  Use <MESSAGE> in commit (default: \${HOSTNAME}:<DIR> Commit For \`date +%F\`)
+END_OF_SHOW_HELP
+} 
+ 
+OPTIND=1
+
+while getopts "hb:d:m:" opt; do
+  case "$opt" in
+    b)	  brch=$OPTARG;;
+    d)	  gdir=$OPTARG;;
+    h)	  show_help && exit 0;;
+    m)	  cmsg=$OPTARG;;
+    '?')  show_help >&2 && exit 1;;
+  esac
+done
+
+shift $((OPTIND-1))
+
+[[ "${brch}" == "" ]] && brch='master'
+[[ "${cmsg}" == "" ]] && cmsg="${HOSTNAME}:${gdir} Commit For `date +%F`"
+[ -n "${gdir}" ] && { [ -d "${gdir}" ] && cd "${gdir}" || { echo "$gdir specified but doesn't exist."; exit 1; } }
+
+git add -A . && git commit -am "${cmsg}" && git push origin "${brch}"

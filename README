@@ -4,35 +4,37 @@ repository are licensed under the GPL v3 unless otherwise stated.
 
 
 
-archtype		List system CPU architecture, reported by GCC
+archtype		  List system CPU architecture, reported by GCC
 
-backup-root-rsync	Backup root partition to another PC via rsync
+backup-root-rsync	  Backup root partition to another PC via rsync
 
-convert2ico		Converts an image to .ico format
+convert2ico		  Converts an image to .ico format
 
-cur-linux-ver		Prints current linux kernel version
+cur-linux-ver		  Prints current linux kernel version
 
-dump-disk-info		Dump Disk Info
+dump-disk-info		  Dump Disk Info
 
-gua			Guided User Add
+git-auto-add-commit-push  Add files to, commit, and push to a git repo
 
-iptmod			Changes firewall rules
+gua			  Guided User Add
 
-myip4			Gets IP addresses (local and public)
+iptmod			  Changes firewall rules
 
-mysql-backup            Backup a MySQL database with individual files
-                        for each table
+myip4			  Gets IP addresses (local and public)
 
-pms-list-all-minus-base	Pacman Shortcut: List all explicitly installed
-			packages except those in base and base-devel
+mysql-backup              Backup a MySQL database with individual files
+			  for each table
 
-pms-remove-orphans	Pacman Shortcut: Remove orphaned packages
+pms-list-all-minus-base	  Pacman Shortcut: List all installed packages
+			  except those in base and base-devel
 
-repo-ck-get-cpu		Lists system's  CPU info as needed by the
-			repo-ck repository for Arch Linux
+pms-remove-orphans	  Pacman Shortcut: Remove orphaned packages
 
-sendEmail		Send email from CLI (Brandon Zehm, GPL v2)
+repo-ck-get-cpu		  Lists system's  CPU info as needed by the
+			  repo-ck repository for Arch Linux
 
-sshd-passwds-toggle	Toggle the acceptance of SSH passwords
+sendEmail		  Send email from CLI (Brandon Zehm, GPL v2)
 
-startvbvm		Attach storage to a VB VM, run, then detach storage
+sshd-passwds-toggle	  Toggle the acceptance of SSH passwords
+
+startvbvm		  Attach storage to a VB VM, run, then detach
