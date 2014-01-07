@@ -1,7 +1,7 @@
 #!/bin/bash
 
 show_help () {
-cat <<END_OF_SHOW_HELP
+/usr/bin/cat <<END_OF_SHOW_HELP
 $0 [ -h ] [ -b <BRANCH> ] [ -d <DIRECTORY> ] [ -m <MESSAGE> ]
 
   -h  Show this help
@@ -29,4 +29,4 @@ shift $((OPTIND-1))
 [[ "${cmsg}" == "" ]] && cmsg="${HOSTNAME}:${gdir} Commit For `date +%F`"
 [ -n "${gdir}" ] && { [ -d "${gdir}" ] && cd "${gdir}" || { echo "$gdir specified but doesn't exist."; exit 1; } }
 
-git add -A . && git commit -am "${cmsg}" && git push origin "${brch}"
+/usr/bin/git add -A . && /usr/bin/git commit -am "${cmsg}" && /usr/bin/git push origin "${brch}"
