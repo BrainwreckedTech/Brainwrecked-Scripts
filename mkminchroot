@@ -1,0 +1,33 @@
+#!/bin/bash
+
+[ $EUID != 0 ] && echo 'MUST BE ROOT!' && exit 1
+
+echo ':: MAKING CHROOT DIRECTORIES...'
+
+mkdir -pv ${1}/{dev,etc,usr}
+mkdir -pv ${1}/usr/bin
+mkdir -pv ${1}/usr/lib
+
+echo ':: MAKING COMPAT SYMLINKS...'
+
+ln -sv usr/bin ${1}/bin
+ln -sv usr/bin ${1}/sbin
+ln -sv usr/lib ${1}/lib
+ln -sv usr/lib ${1}/lib64
+ln -sv lib ${1}/usr/lib64
+ln -sv sbin ${1}/usr/bin
+
+echo ':: GIVING ROOT OWNERSHIP OF CHROOT...'
+
+chown -v root:root ${1}
+
+echo ':: MAKING /DEV/NULL...'
+
+mknod -m 666 ${1}/dev/null c 1 3
+
+echo ':: MAKING MINIMUM /ETC ENTRIES...'
+
+cp -v /etc/ld.so.cache ${1}/etc
+cp -v /etc/ld.so.conf ${1}/etc
+cp -v /etc/nsswitch.conf ${1}/etc
+cp -v /etc/hosts ${1}/etc
