@@ -29,7 +29,7 @@ done
 
 shift $((OPTIND-1))
 
-[ -z ${kfil} ] && sshc = "ssh" || sshc="ssh -i ${kfil}"
+[ -z ${kfil} ] && sshc="ssh" || sshc="ssh -i ${kfil}"
 
 xcld+="--exclude swapfile "
 xcld+="--exclude .thumbnails "
@@ -38,8 +38,8 @@ xcld+="--exclude /var/cache/pacman "
 xcld+="--exclude /srv/build/x86_64/paul "
 xcld+="--exclude /srv/build/i686/paul "
 
-[ -t 1 ] && rsop="${xcld} --progress -xaze" 
-[ -t 1 ] || rsop="${xcld} -qxaze" 
+[ -t 1 ] && rsop="${xcld} --del --delete-excluded --progress -xaze" 
+[ -t 1 ] || rsop="${xcld} --del --delete-excluded -qxaze" 
 
 for binds in `/usr/bin/cat /etc/fstab | /usr/bin/grep bind | /usr/bin/sed 's/\t/ /g' | /usr/bin/sed 's/  */ /g' | /usr/bin/cut -d\  -f2`; do
   [ -t 1 ] && echo Unbinding ${binds}...
