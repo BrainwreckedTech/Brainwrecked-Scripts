@@ -1,14 +1,37 @@
 #!/bin/bash
 
+show_help () {
+/usr/bin/cat <<END_OF_SHOW_HELP
+$0 -d <DESTDIR> -h <HOSTNAME> -k <KEYFILE> -s <SERVICES>
+
+  -d  Directory on remote server where backup will be made
+  -h  Hostname to connect to.
+  -k  Location of key to use
+  -s  Services to stop/start before/after backup
+  -u  User to connect as
+END_OF_SHOW_HELP
+} 
+
 [[ $EUID != 0 ]] && echo "Must have super user privileges." && exit 1
 
-host="$1"
-user="$2"
-rdir="$3"
-svcs="$4"
+OPTIND=1
 
-sshc="ssh -i /home/${user}/.ssh/id_ecdsa"
+while getopts "d:h:k:s:u:" opt; do
+  case "$opt" in
+    d)    rdir=$OPTARG;;
+    h)    host=$OPTARG;;
+    k)    kfil=$OPTARG;;
+    s)    svcs=$OPTARG;;
+    u)    user=$OPTARG;;
+    '?')  show_help >&2 && exit 1;;
+  esac
+done
 
+shift $((OPTIND-1))
+
+[ -z ${kfil} ] && sshc = "ssh" || sshc="ssh -i ${kfil}"
+echo ${sshc}
+echo "`eval ${sshc} ${user}@${host} 'ls ${rdir} -1r|head -1'`"  
 ldir="`eval ${sshc} ${user}@${host} 'ls ${rdir} -1r|head -1'`"  
 [ "$ldir" == "`date +%F`" ] && { [ -t 1 ] && { echo "Already backed up for today"; exit 1; } || exit 1; }
 [[ "$ldir" != "" ]] && ldst="--link-dest=${rdir}/${ldir}"
@@ -31,7 +54,7 @@ done
 [ "${svcs}" != "none" ] && { [ -t 1 ] && echo "Stopping ${svcs}..."; } && /usr/bin/systemctl stop ${svcs}
 
 [ -t 1 ] && echo "Rsyncing to ${user}@${host}..."
-/usr/bin/rsync ${rsop} "${sshc}" / ${2}@${1}:${rdir}/`date +%F`
+/usr/bin/rsync ${rsop} "${sshc}" / ${user}@${host}:${rdir}/`date +%F`
 
 [ "${svcs}" != "none" ] && { [ -t 1 ] && echo "Restarting ${svcs}..."; } && /usr/bin/systemctl start ${svcs}
 
