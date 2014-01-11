@@ -1,0 +1,38 @@
+#!/bin/bash
+# Use this script to copy shared (libs) files to a chroot/jail.
+# ----------------------------------------------------------------------------
+# Written by Paul A. Hinchberger III <http://www.bw-tech.net>
+# (c) 2014 Paul A. Hinchberger III under GNU GPL v2.0+
+# + Changed script to die if chroot/jail dir doesn't exist
+# + Changed chroot/jail dir to be specified on command line
+# + Added copying of binary to chroot/jail
+# ----------------------------------------------------------------------------
+# Orginally written by nixCraft <http://www.cyberciti.biz/tips/>
+# (c) 2006 nixCraft under GNU GPL v2.0+
+# + Added ld-linux support
+# + Added error checking support
+# -------------------------------------------------------------------------------
+
+if [ $# -eq 0 ]; then
+  echo "Syntax : $0 /path/to/jail /path/to/executable "
+  echo "Example: $0 /srv/jail/backup /usr/bin/rsync"
+  exit 1
+fi
+
+[ ! -f $2 ] && echo $2 does not exist && exit 1
+[ ! -d $1 ] && echo $1 does not exist && exit 1 
+
+cp -v $2 $1$2
+
+list="$(ldd $2 | awk '{ print $3 }' |egrep -v ^'\(')"
+
+for file in ${list}; do
+  fdir="$(dirname ${file})"
+  [ ! -d ${1}${fdir} ] && mkdir -p ${1}${fdir}
+  cp -v ${file} ${1}${fdir}
+done
+
+sldl="$(ldd $2 | grep 'ld-linux' | awk '{ print $1}')"
+sdir="$(dirname ${sldl})"
+
+[ ! -f ${1}${sldl} ] && cp -v ${sldl} ${1}${sdir}

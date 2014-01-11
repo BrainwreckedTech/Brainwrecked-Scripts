@@ -1,14 +1,18 @@
 This repository is just a collection of scripts that I've come up with 
-over time that I think are useful enough to share. All scripts in this 
-repository are licensed under the GPL v3 unless otherwise stated.
-
+and/or found over time that I think are useful enough to share.
+All scripts licensed under the GPL v3 unless otherwise stated.
 
 
 archtype		  List system CPU architecture, reported by GCC
 
 backup-root-rsync	  Backup root partition to another PC via rsync
 
+bigpkg                    List space pkgs are taking up (Allan McRae)
+
 convert2ico		  Converts an image to .ico format
+
+cp2chroot                 Copy bins and dependent libs to chroot
+                          (mod of l2chroot by nixCraft)
 
 cur-linux-ver		  Prints current linux kernel version
 
