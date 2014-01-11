@@ -30,11 +30,6 @@ done
 shift $((OPTIND-1))
 
 [ -z ${kfil} ] && sshc = "ssh" || sshc="ssh -i ${kfil}"
-echo ${sshc}
-echo "`eval ${sshc} ${user}@${host} 'ls ${rdir} -1r|head -1'`"  
-ldir="`eval ${sshc} ${user}@${host} 'ls ${rdir} -1r|head -1'`"  
-[ "$ldir" == "`date +%F`" ] && { [ -t 1 ] && { echo "Already backed up for today"; exit 1; } || exit 1; }
-[[ "$ldir" != "" ]] && ldst="--link-dest=${rdir}/${ldir}"
 
 xcld+="--exclude swapfile "
 xcld+="--exclude .thumbnails "
@@ -43,8 +38,8 @@ xcld+="--exclude /var/cache/pacman "
 xcld+="--exclude /srv/build/x86_64/paul "
 xcld+="--exclude /srv/build/i686/paul "
 
-[ -t 1 ] && rsop="${ldst} ${xcld} --progress -xaze" 
-[ -t 1 ] || rsop="${ldst} ${xcld} -qxaze" 
+[ -t 1 ] && rsop="${xcld} --progress -xaze" 
+[ -t 1 ] || rsop="${xcld} -qxaze" 
 
 for binds in `/usr/bin/cat /etc/fstab | /usr/bin/grep bind | /usr/bin/sed 's/\t/ /g' | /usr/bin/sed 's/  */ /g' | /usr/bin/cut -d\  -f2`; do
   [ -t 1 ] && echo Unbinding ${binds}...
@@ -54,7 +49,7 @@ done
 [ "${svcs}" != "none" ] && { [ -t 1 ] && echo "Stopping ${svcs}..."; } && /usr/bin/systemctl stop ${svcs}
 
 [ -t 1 ] && echo "Rsyncing to ${user}@${host}..."
-/usr/bin/rsync ${rsop} "${sshc}" / ${user}@${host}:${rdir}/`date +%F`
+/usr/bin/rsync ${rsop} "${sshc}" / ${user}@${host}:${rdir}
 
 [ "${svcs}" != "none" ] && { [ -t 1 ] && echo "Restarting ${svcs}..."; } && /usr/bin/systemctl start ${svcs}
 
