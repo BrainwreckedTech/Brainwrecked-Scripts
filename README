@@ -39,6 +39,8 @@ repo-ck-get-cpu		  Lists system's  CPU info as needed by the
 
 sendEmail		  Send email from CLI (Brandon Zehm, GPL v2)
 
+ssh-authlock-toggle       Toggle .ssh directory/file security
+
 sshd-passwds-toggle	  Toggle the acceptance of SSH passwords
 
 startvbvm		  Attach storage to a VB VM, run, then detach
