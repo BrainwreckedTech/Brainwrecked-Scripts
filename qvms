@@ -1,0 +1,93 @@
+#!/bin/python
+import configparser, os, sys, psutil, curses, time
+config = configparser.ConfigParser()
+
+def loadConfig():
+  if len(config.read('qvms.ini')) == 0:
+    sys.exit("Couldn't find the configuration file.")
+
+def listActive(window):
+  window.addstr(0, 0, ' ' * curses.COLS, curses.A_REVERSE)
+  window.addstr(0, 0, 'List of running VMs', curses.A_REVERSE)
+  window.addstr(2, 0, '')
+  emptylist = 'none\n'
+
+  for proc in psutil.process_iter():
+    if 'qemu-system' in (''.join(proc.cmdline)):
+      emptylist = ''
+      window.addstr('%6d %s\n' % (proc.pid,proc.name))
+
+  window.addstr(emptylist)
+  window.refresh()
+
+def listAvailable(window):
+  sects = config.sections()
+  if len(sects) % 2 != 0:
+    sects.append(" ")
+
+  split = int(len(sects)/2)
+  sects1 = sects[0:split]
+  sects2 = sects[split:]
+
+  window.addstr(0, 0, ' ' * curses.COLS, curses.A_REVERSE)
+  window.addstr(0, 0, 'List of available VMs', curses.A_REVERSE)
+  window.addstr(2, 0, '')
+
+  for key, value in zip(sects1,sects2):
+    window.addstr("{0:<15s} {1}\n".format(key, value))
+  
+  window.refresh()
+ 
+def startMachine(window):
+  cmd = ''
+  vmn = ''
+  window.addstr(0, 0, ' ' * (curses.COLS -1), curses.A_REVERSE)
+  window.addstr(0, 0, 'Name of VM to start: ', curses.A_REVERSE)
+  curses.echo()
+  vmn = window.getstr()
+  vmn = vmn.decode("utf-8")
+  curses.noecho()
+  try:
+    list = config.items(vmn)
+    for x in range(0, len(list)):
+      cmd += '-%s %s ' % (list[x][0], list[x][1])
+    cmd += ' 2>&1 > /dev/null'
+    cmd = cmd.replace("-actl", "nohup")
+    cmd = cmd.replace("$name", vmn)
+    os.popen(cmd)
+  except configparser.NoSectionError:
+    window.addstr(0, 0, "There is no virtual machine %s defined" % vmn, curses.A_BLINK)
+    window.refresh()
+    time.sleep(2.5)
+
+def main(stdscr):
+  loadConfig()
+  screenWidth = curses.COLS
+  screenHeight = curses.LINES
+  topwinHeight = int(screenHeight * 0.75)
+  botwinHeight = int(screenHeight * 0.25)
+  winActive = curses.newwin(topwinHeight, screenWidth, 0, 0)
+  winAvailable = curses.newwin(botwinHeight, screenWidth, topwinHeight, 0)
+  winInteract = curses.newwin(1, screenWidth, (screenHeight - 1), 0) 
+  stdscr.refresh()
+  while True:
+    listActive(winActive)
+    listAvailable(winAvailable)
+    winInteract.addstr(0, 0, ' ' * (curses.COLS -1), curses.A_REVERSE)
+    winInteract.addstr(0, 0, '(K)ill, (R)efresh, (S)tart, or e(X)it: ', curses.A_REVERSE)
+    winInteract.refresh()
+    choice = stdscr.getch()
+    if choice == ord('k'):
+      winInteract.addstr(0,0,'Kill functionality has not been implemented yet', curses.A_BLINK)
+      winInteract.refresh()
+      time.sleep(2.5)
+    elif choice == ord('r'):
+      listActive(winActive)
+      listAvailable(winAvailable)
+    elif choice == ord('s'):
+      startMachine(winInteract)
+    elif choice == ord('x'):
+      curses.endwin()
+      sys.exit()
+  
+curses.wrapper(main)

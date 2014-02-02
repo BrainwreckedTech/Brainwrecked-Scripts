@@ -18,6 +18,8 @@ cur-linux-ver		  Prints current linux kernel version
 
 dump-disk-info		  Dump Disk Info
 
+get-systemd-services      List systemd services (name only, skip systemd*)
+
 git-auto-add-commit-push  Add files to, commit, and push to a git repo
 
 gua			  Guided User Add
@@ -33,6 +35,8 @@ pms-list-all-minus-base	  Pacman Shortcut: List all installed packages
 			  except those in base and base-devel
 
 pms-remove-orphans	  Pacman Shortcut: Remove orphaned packages
+
+qvms                      Python script for managing QEMU VMs
 
 repo-ck-get-cpu		  Lists system's  CPU info as needed by the
 			  repo-ck repository for Arch Linux
