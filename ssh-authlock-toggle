@@ -1,0 +1,21 @@
+#!/bin/bash
+
+ssh_lock() {
+  echo -e "\e[34m:: \e[97m$HOME/.ssh insecure...locking\e[0m"
+  sudo chmod -v 400 $HOME/.ssh/*
+  sudo chattr -V +i $HOME/.ssh/authorized_keys
+  sudo chattr -V +i $HOME/.ssh
+}
+
+ssh_unlock() {
+  echo ":: $HOME/.ssh secured...unlocking"
+  sudo chattr -V -i $HOME/.ssh
+  sudo chattr -V -i $HOME/.ssh/authorized_keys
+  sudo chmod -v 600 $HOME/.ssh/*
+}
+
+da=$(lsattr -d $HOME/.ssh | cut -d\  -f1 | grep -q 'i')$?
+fa=$(lsattr $HOME/.ssh/authorized_keys | cut -d\  -f1 | grep -q 'i')$?
+fp=$(ls -lA $HOME/.ssh | grep -v total | cut -d\  -f1 | grep -q 'w')$?
+
+[ $da = 0 -a $fa = 0 -a $fp != 0 ] && ssh_unlock || ssh_lock
