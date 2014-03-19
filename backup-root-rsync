@@ -34,6 +34,7 @@ shift $((OPTIND-1))
 xcld+="--exclude swapfile "
 xcld+="--exclude .thumbnails "
 xcld+="--exclude .cache "
+xcld+="--exclude Trash "
 xcld+="--exclude /var/cache/pacman "
 xcld+="--exclude /srv/build/x86_64/paul "
 xcld+="--exclude /srv/build/i686/paul "

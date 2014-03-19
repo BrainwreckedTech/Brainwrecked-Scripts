@@ -1,14 +1,14 @@
 #!/bin/bash
 
 ssh_lock() {
-  echo -e "\e[34m:: \e[97m$HOME/.ssh insecure...locking\e[0m"
+  echo -e "\e[34m:: \e[97m $HOME/.ssh insecure...locking\e[0m"
   sudo chmod -v 400 $HOME/.ssh/*
   sudo chattr -V +i $HOME/.ssh/authorized_keys
   sudo chattr -V +i $HOME/.ssh
 }
 
 ssh_unlock() {
-  echo ":: $HOME/.ssh secured...unlocking"
+  echo -e "\e[34m:: \e[97m $HOME/.ssh secured...unlocking\e[0m"
   sudo chattr -V -i $HOME/.ssh
   sudo chattr -V -i $HOME/.ssh/authorized_keys
   sudo chmod -v 600 $HOME/.ssh/*
