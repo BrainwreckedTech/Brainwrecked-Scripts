@@ -58,7 +58,7 @@ sleep 1
 ps $VMPID &> /dev/null || ( echo "QEMU failed to start" && exit 1 )
 
 echo "Starting SPICE client..." 
-su -c 'DISPLAY=:0.0 spicec -h 192.168.100.79 -p 6000 &> /dev/null' - $SUDO_USER &
+su -c 'DISPLAY=:0.0 spicec -h localhost -p 6000 &> /dev/null' - $SUDO_USER &
 
 sleep 1
 umount -v "${MTPTS}/${VMNAM}"
