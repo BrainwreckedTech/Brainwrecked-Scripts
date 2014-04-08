@@ -1,9 +1,23 @@
 #!/bin/bash
 if [ `which gcc 2> /dev/null` ]; then
-  gcc -c -Q -march=native --help=target | grep march | sed 's/[ \t]*//g' | cut -d= -f2 | \
-  sed 's/corei7/nahelem/g;s/corei7-avx-i/sandybridge/g;s/core-avx2/haswell/g;s/pentium4/p4/g;s/nocona/p4/g;s/pentium-m/pentm/g' | \
-  sed 's/athlon.*/kx/g;s/k8-sse3/kx/g;s/amdfam10/k10/g;s/btver1/bobcat/g;s/bdver1/bulldozer/g;s/bdver2/piledriver/g;'
-  rm help-dummy.o
+  case $(gcc -c -Q -march=native --help=target | grep march | sed 's/\s\s*//g' | cut -d= -f2) in
+    atom)		echo ck-atom ;;
+    core2)		echo ck-core2 ;;
+    corei7)		echo ck-nehalem ;;
+    corei7-avx)		echo ck-sandybridge ;;
+    core-avx-i)		echo ck-ivybridge ;;
+    core-avx2)		echo ck-haswell ;;
+    pentium4|nocona)	echo ck-p4 ;;
+    pentm|pentium-m)	echo ck-pentm ;;
+
+    athlon|athlon-4|athlon-tbird|athlon-mp|athlon-mp|athlon-xp|k8-sse3)	echo ck-kx ;;
+    barcelona)		echo ck-barcelona ;;
+    btver1)		echo ck-bobcat ;;
+    bdver1)		echo ck-bulldozer ;;
+    bdver2)		echo ck-piledriver ;;
+    
+    *)			echo ck ;;
+  esac
 else
   echo "You need to install gcc."
 fi

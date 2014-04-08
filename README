@@ -36,7 +36,15 @@ pms-list-all-minus-base	  Pacman Shortcut: List all installed packages
 
 pms-remove-orphans	  Pacman Shortcut: Remove orphaned packages
 
+qemu-launcher             Script to launch QEMU VMs.
+
 qvms                      Python script for managing QEMU VMs
+
+remote-reboot             Shortcut to reboot a remote machine via SSH
+                          while giving time to properly exit SSH 
+
+remote-shutdown           Shortcut to shut down a remote machine via
+                          SSH while giving time to properly exit SSH 
 
 repo-ck-get-cpu		  Lists system's  CPU info as needed by the
 			  repo-ck repository for Arch Linux

@@ -1,0 +1,64 @@
+#!/bin/sh
+
+# NOTES:
+# - Use QXL/SPICE so qemu can run as another user
+# - Must use nomodeset with QXL or DMs will crash on user logout
+
+[[ $EUID != 0 || -z $SUDO_USER ]] && echo "Must use sudo to run as root." && exit 1
+
+ISOIM=/dev/null
+NFSMT=/mnt/nfs
+CROOT=false
+DSKBL=/dev/disk/by-label
+MTPTS=/mnt/qvm
+VIDEO="qxl -spice port=6000,disable-ticketing"
+
+while [ "$1" != "" ]; do
+  case $1 in
+    --ram )	shift && RAMSZ="$1" ;;
+    --name )	shift && VMNAM="$1" ;;
+    --iso )	shift && ISOIM="$1" && BTPRM="-boot d" ;;
+    --rescue )	shift && RKPRM="single" ;;
+    --chroot )	shift && CROOT=true
+  esac
+  shift
+done
+
+fsck -faMT ${DSKBL}/${VMNAM}
+
+if $CROOT; then
+  mount -v ${DSKBL}/${VMNAM} ${MTPTS}/${VMNAM}
+  mkdir -p ${MTPTS}/${VMNAM}/${NFSMT}
+  mount -v --bind ${NFSMT} ${MTPTS}/${VMNAM}/${NFSMT}
+  arch-chroot ${MTPTS}/${VMNAM}
+  umount ${MTPTS}/${VMNAM}/${NFSMT}
+  umount ${DSKBL}/${VMNAM}
+  exit 0
+fi
+
+mount -vo ro,noexec ${DSKBL}/${VMNAM} ${MTPTS}/${VMNAM}
+
+if [ "$BTPRM" != "-boot d" ]; then
+  BTPRM="-kernel `ls -1 ${MTPTS}/${VMNAM}/boot/vmlinu* 2> /dev/null | sort -Vr | head -1` "
+  BTPRM+="-initrd `ls -1 ${MTPTS}/${VMNAM}/boot/initr* 2> /dev/null | sort -Vr | head -1` "
+  [[ -n $BTPRM ]] && BTPRM+="-append 'root=/dev/vda rw nomodeset $RKPRM'"
+fi
+  
+echo "$BTPRM" | sed 's/ -/\n-/g'
+
+eval qemu-system-x86_64 -name "${VMNAM}" -runas qemu \
+  -enable-kvm -cpu host -machine type=pc,accel=kvm -balloon virtio \
+  -m $RAMSZ -vga qxl -spice port=6000,disable-ticketing -net nic,model=virtio -net user -usbdevice tablet \
+  -drive file="${DSKBL}/${VMNAM}",index=0,media=disk,if=virtio \
+  -drive file="$ISOIM",index=1,media=cdrom $BTPRM &> /dev/null &
+VMPID=$!
+
+echo "QEMU PID IS ${VMPID} FOR ${VMNAM}"
+sleep 1
+ps $VMPID &> /dev/null || ( echo "QEMU failed to start" && exit 1 )
+
+echo "Starting SPICE client..." 
+su -c 'DISPLAY=:0.0 spicec -h 192.168.100.79 -p 6000 &> /dev/null' - $SUDO_USER &
+
+sleep 1
+umount -v "${MTPTS}/${VMNAM}"
