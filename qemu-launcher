@@ -46,7 +46,7 @@ fi
 
 NFSMT=/mnt/nfs
 VIDEO="std"
-VIDEO="qxl -spice port=6000,disable-ticketing"
+VIDEO="qxl -spice port=6000,disable-ticketing -global qxl.vram_size=268435456"
 
 CROOT=false
 INITP=false

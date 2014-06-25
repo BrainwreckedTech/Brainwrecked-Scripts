@@ -6,6 +6,8 @@ echo $kuse in use.
 
 if [ `echo $kuse | grep 'ck'` ]; then
   echo "`pacman -Q linux-ck-$arch | cut -d\  -f2`-ck installed."
+elif [ `echo $kuse | grep 'lts'` ]; then
+  echo "`pacman -Q linux-lts | cut -d\  -f2`-lts installed."
 else
   echo "`pacman -Q linux | cut -d\  -f2` installed."
 fi
