@@ -36,7 +36,7 @@ pms-list-all-minus-base	  Pacman Shortcut: List all installed packages
 
 pms-remove-orphans	  Pacman Shortcut: Remove orphaned packages
 
-qemu-launcher             Script to launch QEMU VMs.
+qcl			  Script to launch QEMU VMs.
 
 qvms                      Python script for managing QEMU VMs
 

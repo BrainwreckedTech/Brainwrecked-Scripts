@@ -13,6 +13,8 @@ main options:
       -m <MiB size>  Specify RAM available to VM  
       -p </dev/part> Partition that serves as the primary bootable drive
       -s </dev/part> Partition that serves as the secondary drive
+      -u             Use USB mouse instead of tablet device
+      -r             Use SPICE instead of VNC
       
 ISO options:
 
@@ -45,23 +47,25 @@ if [ ${EUID} != 0 -o -z "${SUDO_USER}" ]; then
 fi
 
 NFSMT=/mnt/nfs
-VIDEO="std"
-VIDEO="qxl -spice port=6000,disable-ticketing -global qxl.vram_size=268435456"
+MOUSE=tablet
+VIDEO="std -nographic -vnc :0"
 
 CROOT=false
 INITP=false
 
-while getopts "b:cd:hil:m:p:s:" opt; do
+while getopts "b:cd:hil:m:p:rs:u" opt; do
   case "$opt" in
     b) BTISO="${OPTARG}" ;;
-    c) CROOT=true ;;
+    c) CROOT=true        ;;
     d) DRISO="${OPTARG}" ;;
-    h) show_help && exit 0;;
-    i) INITP=true ;;
+    h) show_help; exit 0 ;;
+    i) INITP=true        ;;
     l) LSPTD="${OPTARG}" ;;
     m) RAMSZ="${OPTARG}" ;;
     p) PRIDR="${OPTARG}" ;;
+    r) VIDEO="qxl -spice port=6000,disable-ticketing" ;;
     s) SCNDR="${OPTARG}" ;;
+    u) MOUSE="mouse   "  ;;
     '?') show_help >&2 && exit 1;;
   esac
 done
@@ -121,9 +125,14 @@ echo "$SDRVS" | sed 's/ -/\n-/g'
 echo "$BTPRM"
 
 chown -v qemu ${PRIDR}
-bash -c "sleep 1; su -c 'DISPLAY=:0.0 spicec -h localhost -p 6000 &> /dev/null' - ${SUDO_USER}" &
+case ${VIDEO} in
+  *vnc*)
+    bash -c "sleep 1; su -c 'DISPLAY=:0.0 vncviewer :0' - ${SUDO_USER}" & ;;
+  *qxl*)
+    bash -c "sleep 1; su -c 'DISPLAY=:0.0 spicec -h localhost -p 6000 &> /dev/null' - ${SUDO_USER}" & ;;
+esac
 echo 'Press CTRL+C to force-quit qemu'
 eval sudo qemu-system-x86_64 -runas qemu \
   -enable-kvm -cpu host -machine type=pc,accel=kvm -balloon virtio \
-  -smp 2 -parallel none -serial none -usbdevice tablet \
+  -smp cores=2 -parallel none -serial none -usbdevice ${MOUSE} \
   -m $RAMSZ -vga $VIDEO -net nic,model=virtio -net user ${SDRVS} ${BTPRM}
