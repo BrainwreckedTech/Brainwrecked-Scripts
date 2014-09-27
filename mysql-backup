@@ -5,6 +5,7 @@ bdir="/srv/backup/mysql"
 
 rm ${bdir}/*.sql
 
+/usr/bin/mysqldump -u${user} -p${pswd} --all-databases > ${bdir}/ALL-ALL.sql
 /usr/bin/mysqldump -td -u${user} -p${pswd} --all-databases > ${bdir}/ALL-DTBS.sql
 
 dcmd="/usr/bin/mysql -u${user} -p${pswd} -sre 'show databases;' |

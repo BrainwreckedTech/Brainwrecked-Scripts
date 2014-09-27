@@ -36,8 +36,8 @@ xcld+="--exclude .thumbnails "
 xcld+="--exclude .cache "
 xcld+="--exclude Trash "
 xcld+="--exclude /var/cache/pacman "
-xcld+="--exclude /srv/build/x86_64/paul "
-xcld+="--exclude /srv/build/i686/paul "
+xcld+="--exclude /srv/build/x86_64/aurpbs "
+xcld+="--exclude /srv/build/i686/aurpbs "
 
 [ -t 1 ] && rsop="${xcld} --del --delete-excluded --progress -xaze" 
 [ -t 1 ] || rsop="${xcld} --del --delete-excluded -qxaze" 
@@ -48,6 +48,8 @@ for binds in `/usr/bin/cat /etc/fstab | /usr/bin/grep bind | /usr/bin/sed 's/\t/
 done
 
 [ "${svcs}" != "none" ] && { [ -t 1 ] && echo "Stopping ${svcs}..."; } && /usr/bin/systemctl stop ${svcs}
+
+touch /.bkupstmp
 
 [ -t 1 ] && echo "Rsyncing to ${user}@${host}..."
 /usr/bin/rsync ${rsop} "${sshc}" / ${user}@${host}:${rdir}

@@ -11,3 +11,13 @@ cmd="/usr/bin/sudo /usr/bin/pacman -Syu"
 
 # Execute command
 eval $cmd
+
+# Check /usr/bin/init
+if [ -e /usr/bin/init-kexec ]; then
+  /usr/bin/sudo /usr/bin/diff -qs /usr/bin/init /usr/bin/init-kexec
+  if [ $? != 0 ]; then
+    /usr/bin/sudo /usr/bin/rm /usr/bin/init
+    /usr/bin/sudo /usr/bin/cp /usr/bin/init-kexec /usr/bin/init
+    echo "Replaced /usr/bin/init"
+  fi
+fi
