@@ -1,21 +1,35 @@
 # A program to temporarily modify an IPTables firewall.
 # Port list is gathered from /etc/iptmod
 
-# Usage: iptmod [ A | D ] [ip-list]
+# Usage: iptmod [ A | D ] [ip-list] [services]
 #
-#   A or D   Add or Delete rules
+#   A or D     Add or Delete rules
 #
-#   ip-list   Comma-seperated list of IPs to open ports for
+#   ip-list    Comma-seperated list of IPs to open ports for
+#
+#   services   Comma-seperated list of services to open for [ip-list]
 
 IPT=iptables
+OFS="$IFS"
+IFS=","
+MOD=$1
+
+function openports() {
+  for PORT in $1; do
+    sudo iptables -$MOD UDP -s $ADDR -p udp -m udp --dport $PORT -j ACCEPT
+    sudo iptables -$MOD TCP -s $ADDR -p tcp -m tcp --dport $PORT -j ACCEPT
+  done
+}
 
 for ADDR in $2;  do
-  for PORT in `cat /etc/iptmod`; do
-    for PROT in tcp udp; do
-      TBL=`echo $PROT | tr 'tucdp' 'TUCDP'`
-      $IPT -$1 $TBL -s $ADDR -i eth1 -p $PROT -m $PROT --dport $PORT -j ACCEPT
-    done
-    [[ $1 == A ]] && echo "IP address $ADDR now has access to port(s) $PORT"
-    [[ $1 == D ]] && echo "IP address $ADDR now denied access to port(s) $PORT"
+  for SRVC in $3; do
+    [[ $SRVC == pop3  || $SRVC == all ]] && openports "110"
+    [[ $SRVC == samba || $SRVC == all ]] && openports "137:139"
+    [[ $SRVC == nfs   || $SRVC == all ]] && openports "111,1110,2049,3095,4045"
+    [[ $SRVC == dlna  || $SRVC == all ]] && openports "8200"
+    [[ $SRVC == btwsq || $SRVC == all ]] && openports "8888"
+    [[ $SRVC == sshd  || $SRVC == all ]] && openports "28282"
   done
-done 
+done
+
+IFS="$OFS"
