@@ -127,7 +127,7 @@ echo "$BTPRM"
 chown -v qemu ${PRIDR}
 case ${VIDEO} in
   *vnc*)
-    bash -c "sleep 1; su -c 'DISPLAY=:0.0 vncviewer :0' - ${SUDO_USER}" & ;;
+    bash -c "sleep 1; su -c 'DISPLAY=:0.0 vncviewer :0' - ${SUDO_USER}" &> /dev/null & ;;
   *qxl*)
     bash -c "sleep 1; su -c 'DISPLAY=:0.0 spicec -h localhost -p 6000 &> /dev/null' - ${SUDO_USER}" & ;;
 esac
