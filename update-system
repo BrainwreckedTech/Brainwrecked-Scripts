@@ -1,3 +1,4 @@
+#!/bin/bash
 # This script automates system updates in Arch Linux
 
 # Call the update-reflector script to get the best mirrors
@@ -11,6 +12,11 @@ cmd="/usr/bin/sudo /usr/bin/pacman -Syu"
 
 # Execute command
 eval $cmd
+
+# Adds apt-like warning of packages no longer needed
+echo -n "Checking for orphaned packages..."
+orphed="$(pacman -Qtdq)"; echo "done"
+[[ -n "${orphed}" ]] && echo -e "The following packages are no longer required:\n${orphed}"
 
 # Check /usr/bin/init
 if [ -e /usr/bin/init-kexec ]; then
