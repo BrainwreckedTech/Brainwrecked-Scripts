@@ -11,12 +11,27 @@ cmd="/usr/bin/sudo /usr/bin/pacman -Syu"
 [[ -d /mnt/nfs/pacman/pkg ]] && cmd+=" --cachedir /mnt/nfs/pacman/pkg"
 
 # Execute command
-eval $cmd
+eval "$cmd"
 
-# Adds apt-like warning of packages no longer needed
-echo -n "Checking for orphaned packages..."
-orphed="$(pacman -Qtdq)"; echo "done"
-[[ -n "${orphed}" ]] && echo -e "The following packages are no longer required:\n${orphed}"
+tty -s && type pacaur > /dev/null && pacaur -u --devel --noedit
+
+# Adds apt-like warning of packages no longer needed if TTY
+if tty -s; then
+ echo -n "Checking for orphaned packages..."
+ orphed="$(pacman -Qtdq | sed ':a;N;$!ba;s/\n/ /g')"; echo "done"
+ if [ -n "${orphed}" ]; then
+  echo -e '\e[1;34m:: \e[1;37mThe following packages are no longer required.  '
+  #echo -e  'Use \e[1;33mpacman -Rs $(pacman -Qtdq)\e[1;37m to remove them.\e[0m'
+  echo "${orphed}"
+  read -n 1 -t 60 -p "Remove orphans now? [y/N]: " RMORPH
+  echo ""
+  case ${RMORPH} in
+   y|Y) /usr/bin/sudo /usr/bin/pacman -Rs $(/usr/bin/pacman -Qtdq) ;;
+   n|N) echo "Not removing orphans at this time." ;;
+   *) echo "60-second timeout reached.  Not removing orphans." ;;
+  esac
+ fi
+fi
 
 # Check /usr/bin/init
 if [ -e /usr/bin/init-kexec ]; then
