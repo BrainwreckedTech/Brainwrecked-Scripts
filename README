@@ -28,6 +28,8 @@ gua			  Guided User Add
 
 iptmod			  Changes firewall rules
 
+monitor_off               Turn off monitor (Vinicius, license unknown)
+
 myip4			  Gets IP addresses (local and public)
 
 mysql-backup              Backup a MySQL database with individual files
