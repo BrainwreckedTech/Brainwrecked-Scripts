@@ -22,6 +22,8 @@ get-systemd-services      List systemd services (name only, skip systemd*)
 
 git-auto-add-commit-push  Add files to, commit, and push to a git repo
 
+gmi                       Get Machine Info - Prints a line with HW/OS info
+
 gua			  Guided User Add
 
 iptmod			  Changes firewall rules
@@ -35,8 +37,6 @@ pms-list-all-minus-base	  Pacman Shortcut: List all installed packages
 			  except those in base and base-devel
 
 pms-remove-orphans	  Pacman Shortcut: Remove orphaned packages
-
-qcl			  Script to launch QEMU VMs.
 
 qvms                      Python script for managing QEMU VMs
 

@@ -1,0 +1,47 @@
+#!/bin/bash
+#########################################################################
+#	GMI - Get Machine Info						#
+#	Copyright (C) 2015 Paul A. Hinchberger III			#
+#########################################################################
+#	This program is free software: you can redistribute it and/	#
+#	or modify it under the terms of the GNU GPLv3 as published	#
+#	by the Free Software Foundation.				#
+#									#
+#	This program is distributed in the hope that it will be		#
+#	useful, but WITHOUT ANY WARRANTY; without even the implied	#
+#	warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR		#
+#	PURPOSE.  See the GNU GPLv3 for more details.			#
+#									#
+#	See <http://www.gnu.org/licenses/> for details.			#
+#########################################################################
+
+RAM=$(bc <<< "scale=2;$(vmstat -s | grep 'total memory' | cut -dK -f1 | sed 's/  *//g')/1024/1024" | sed 's/^\./0./g')
+MHZ=$( ( lscpu | grep 'CPU max MHz' > /dev/null && ( lscpu | grep 'CPU max MHz' | head -n 1 ) || ( lscpu | grep 'CPU MHz' | head -n 1 ) ) | cut -d: -f2 | cut -d. -f1 | sed 's/  *//g;' )
+PMH=00${MHZ}
+PMH=${PMH: -4}
+GHZ="${PMH:0:1}.${PMH:1:2}"
+PCC=$(cat /proc/cpuinfo | sort -u | grep -c '^core id')
+LCC=$(cat /proc/cpuinfo | grep -c '^processor')
+DST="$(uname -m | sed 's/x86_64/x64/g;s/i686/x86/g') $(cat /etc/os-release | grep PRETTY_NAME | cut -d\" -f2)"
+CPU="$(lscpu | grep '^Arch\|^Vendor ID\|^Model name' | head -n 3 | cut -d: -f2 | sed 's/   *//g;s/^ //g;s/@.*//g;s/(TM)//gI;s/(R)//gI;s/ [0-9]*MHz//g;s/ CPU//gI' | sed ':a;N;$!ba;s/\n/ /g' | \
+sed "s/x86_64/x64/g;s/i686/x86/g;" | \
+sed 's/CentaurHauls //g;s/GenuineIntel/Intel/g;s/Intel Atom/Atom/g;s/Intel Celeron/Celeron/g;s/Pentium /P/g;s/ with Radeon HD Graphics//g;s/AuthenticAMD //g;s/Dual Core //g;s/ Processor//g')"
+
+[ $(expr $PCC \* 2) == $LCC ] && HTT="HT"
+
+if type Xorg &> /dev/null; then
+  DTE="Xorg (Unkown/No DE)"
+  type openbox-session &> /dev/null && DTE="Openbox" # has to be first as it can be used stand-alone or with other DEs
+  type cinnamon-session &> /dev/null && DTE="Cinnamon"
+  type gnome-session &> /dev/null && DTE="GNOME 3"
+  type plasma-desktop &> /dev/null && DTE="Plasma 4"
+  type plasmashell &> /dev/null && DTE="Plasma 5"
+  type startlxde &> /dev/null && DTE="LXDE"
+  type startlxqt &> /dev/null && DTE="LXQt"
+  type mate-session &> /dev/null && DTE="MATE"
+  type startxfce4 &> /dev/null && DTE="XFCE"
+else
+  DTE="CLI"
+fi
+
+echo "${CPU} ${GHZ}GHz x${PCC}${HTT} ${RAM}GB RAM running ${DST} ${DTE}"
