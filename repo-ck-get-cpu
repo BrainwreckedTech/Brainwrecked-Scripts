@@ -11,6 +11,7 @@ if [ `which gcc 2> /dev/null` ]; then
     pentm|pentium-m)	echo ck-pentm ;;
 
     athlon|athlon-4|athlon-tbird|athlon-mp|athlon-mp|athlon-xp|k8-sse3)	echo ck-kx ;;
+    amdfam10)		echo ck-k10 ;;
     barcelona)		echo ck-barcelona ;;
     btver1)		echo ck-bobcat ;;
     bdver1)		echo ck-bulldozer ;;
