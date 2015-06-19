@@ -1,2 +1,2 @@
 #!/bin/bash
-pacman -Rs $(pacman -Qtdq)
+/usr/bin/sudo /usr/bin/pacman -Rs $(/usr/bin/pacman -Qtdq)
