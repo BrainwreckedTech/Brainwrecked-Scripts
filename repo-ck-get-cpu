@@ -1,24 +1,29 @@
 #!/bin/bash
 if [ `which gcc 2> /dev/null` ]; then
-  case $(gcc -c -Q -march=native --help=target | grep march | sed 's/\s\s*//g' | cut -d= -f2) in
-    atom)		echo ck-atom ;;
-    core2)		echo ck-core2 ;;
-    corei7)		echo ck-nehalem ;;
-    corei7-avx)		echo ck-sandybridge ;;
-    core-avx-i)		echo ck-ivybridge ;;
-    core-avx2)		echo ck-haswell ;;
-    pentium4|nocona)	echo ck-p4 ;;
-    pentm|pentium-m)	echo ck-pentm ;;
+  if [ "$( echo -e "4.9\n$(gcc --version | grep gcc | cut -d\  -f3)" | sort -V | head -n 1 )" == "4.9" ]; then
+    case $(gcc -c -Q -march=native --help=target | grep march | sed 's/\s\s*//g' 2> /dev/null | cut -d= -f2) in
+      bonnell)		echo ck-atom ;;
+      silvermont)	echo ck-silvermont ;;
+      core2)		echo ck-core2 ;;
+      nahelem)		echo ck-nehalem ;;
+      sandybridge)	echo ck-sandybridge ;;
+      ivybridge)	echo ck-ivybridge ;;
+      haswell)		echo ck-haswell ;;
+      broadwell)	echo ck-broadwell ;;
+      pentium4|nocona)	echo ck-p4 ;;
+      pentm|pentium-m)	echo ck-pentm ;;
 
-    athlon|athlon-4|athlon-tbird|athlon-mp|athlon-mp|athlon-xp|k8-sse3)	echo ck-kx ;;
-    amdfam10)		echo ck-k10 ;;
-    barcelona)		echo ck-barcelona ;;
-    btver1)		echo ck-bobcat ;;
-    bdver1)		echo ck-bulldozer ;;
-    bdver2)		echo ck-piledriver ;;
+      athlon|athlon-4|athlon-tbird|athlon-mp|athlon-xp|k8-sse3)	echo ck-kx ;;
+      amdfam10)		echo ck-k10 ;;
+      btver1)		echo ck-bobcat ;;
+      bdver1)		echo ck-bulldozer ;;
+      bdver2)		echo ck-piledriver ;;
     
-    *)			echo ck ;;
-  esac
+      *)		echo ck ;;
+    esac
+  else
+    echo "GCC version >=4.9 required."
+  fi
 else
-  echo "You need to install gcc."
+  echo "GCC is not installed."
 fi
