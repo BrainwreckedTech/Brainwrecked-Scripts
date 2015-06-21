@@ -27,3 +27,8 @@ if [ `which gcc 2> /dev/null` ]; then
 else
   echo "GCC is not installed."
 fi
+
+CKINST="No ck package $(pacman -Qqs linux-ck | grep -v 'broadcom\|headers\|nvidia\|virtualbox') installed."
+CKINST="${CKINST/No ck package linux/linux}"
+CKINST="${CKINST/linux-/}"
+echo $CKINST >&2
