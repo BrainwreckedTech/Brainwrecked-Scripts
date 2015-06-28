@@ -1,26 +1,31 @@
 #!/bin/bash
 if [ `which gcc 2> /dev/null` ]; then
   if [ "$( echo -e "4.9\n$(gcc --version | grep gcc | cut -d\  -f3)" | sort -V | head -n 1 )" == "4.9" ]; then
-    case $(gcc -c -Q -march=native --help=target | grep march | sed 's/\s\s*//g' 2> /dev/null | cut -d= -f2) in
-      bonnell)		echo ck-atom ;;
-      silvermont)	echo ck-silvermont ;;
-      core2)		echo ck-core2 ;;
-      nahelem)		echo ck-nehalem ;;
-      sandybridge)	echo ck-sandybridge ;;
-      ivybridge)	echo ck-ivybridge ;;
-      haswell)		echo ck-haswell ;;
-      broadwell)	echo ck-broadwell ;;
-      pentium4|nocona)	echo ck-p4 ;;
-      pentm|pentium-m)	echo ck-pentm ;;
+    CKINFO="$(gcc -c -Q -march=native --help=target | grep 'march=\|mtune=' | sed ':a;N;$!ba;s/\t/ /g;s/  *//g;s/-//g;s/\n/ /g')"
+    echo $CKINFO
+    GMARCH=${CKINFO% *=*}
+    GMARCH=${GMARCH#*=}
+    case ${GMARCH} in
+      bonnell)                  echo -n ck-atom ;;
+      silvermont)               echo -n ck-silvermont ;;
+      core2)                    echo -n ck-core2 ;;
+      nahelem)                  echo -n ck-nehalem ;;
+      sandybridge)              echo -n ck-sandybridge ;;
+      ivybridge)                echo -n ck-ivybridge ;;
+      haswell)		        echo -n ck-haswell ;;
+      broadwell)                echo -n ck-broadwell ;;
+      pentium4|prescott|nocona) echo -n ck-p4 ;;
+      pentm|pentium-m)          echo -n ck-pentm ;;
 
-      athlon|athlon-4|athlon-tbird|athlon-mp|athlon-xp|k8-sse3)	echo ck-kx ;;
-      amdfam10)		echo ck-k10 ;;
-      btver1)		echo ck-bobcat ;;
-      bdver1)		echo ck-bulldozer ;;
-      bdver2)		echo ck-piledriver ;;
+      athlon|athlon-4|athlon-tbird|athlon-mp|athlon-xp|k8-sse3)	echo -n ck-kx ;;
+      amdfam10) echo -n ck-k10 ;;
+      btver1)   echo -n ck-bobcat ;;
+      bdver1)   echo -n ck-bulldozer ;;
+      bdver2)   echo -n ck-piledriver ;;
     
-      *)		echo ck ;;
+      *)    echo -n ck-generic ;;
     esac
+    echo ' recommended.'
   else
     echo "GCC version >=4.9 required."
   fi
@@ -28,7 +33,7 @@ else
   echo "GCC is not installed."
 fi
 
-CKINST="No ck package $(pacman -Qqs linux-ck | grep -v 'broadcom\|headers\|nvidia\|virtualbox') installed."
+CKINST="No ck package $(pacman -Qqs linux-ck | sed 's/ck$/ck-generic/g' | grep -v 'broadcom\|headers\|nvidia\|virtualbox') installed."
 CKINST="${CKINST/No ck package linux/linux}"
 CKINST="${CKINST/linux-/}"
 echo $CKINST >&2
