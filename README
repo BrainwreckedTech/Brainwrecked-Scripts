@@ -9,6 +9,9 @@ backup-root-rsync	  Backup root partition to another PC via rsync
 
 bigpkg                    List space pkgs are taking up (Allan McRae)
 
+ckinfo                    Lists system's CPU info as needed by the
+			  repo-ck repository for Arch Linux
+
 convert2ico		  Converts an image to .ico format
 
 cp2chroot                 Copy bins and dependent libs to chroot
@@ -47,9 +50,6 @@ remote-reboot             Shortcut to reboot a remote machine via SSH
 
 remote-shutdown           Shortcut to shut down a remote machine via
                           SSH while giving time to properly exit SSH 
-
-repo-ck-get-cpu		  Lists system's  CPU info as needed by the
-			  repo-ck repository for Arch Linux
 
 sendEmail		  Send email from CLI (Brandon Zehm, GPL v2)
 
