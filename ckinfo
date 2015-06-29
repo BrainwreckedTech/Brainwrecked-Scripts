@@ -1,7 +1,7 @@
 #!/bin/bash
 if [ `which gcc 2> /dev/null` ]; then
   if [ "$( echo -e "4.9\n$(gcc --version | grep gcc | cut -d\  -f3)" | sort -V | head -n 1 )" == "4.9" ]; then
-    CKINFO="$(gcc -c -Q -march=native --help=target | grep 'march=\|mtune=' | sed ':a;N;$!ba;s/\t/ /g;s/  *//g;s/-//g;s/\n/ /g')"
+    CKINFO="$(gcc -c -Q -march=native --help=target | grep 'march=\|mtune=' | sed ':a;N;$!ba;s/\t/ /g;s/  *//g;s/-m/m/g;s/\n/ /g')"
     echo $CKINFO
     GMARCH=${CKINFO% *=*}
     GMARCH=${GMARCH#*=}
