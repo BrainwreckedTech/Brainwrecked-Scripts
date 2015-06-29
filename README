@@ -38,6 +38,8 @@ myip4			  Gets IP addresses (local and public)
 mysql-backup              Backup a MySQL database with individual files
 			  for each table
 
+netinfo                   Displays network information (udev/networkd/et al).
+
 pms-list-all-minus-base	  Pacman Shortcut: List all installed packages
 			  except those in base and base-devel
 
