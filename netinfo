@@ -1,5 +1,15 @@
 #!/bin/bash
 
+OSBFCT=false
+
+while getopts "o" OPT; do
+  case "${OPT}" in
+    o) OBSFCT=true
+  esac
+done
+
+shift $((OPTIND-1))
+
 NIFACE=( $(\ls -1 /sys/class/net | grep -v lo | sort -V | tr '\n' ' ') )
 
 ! type ethtool &> /dev/null && ! type mii-tool &> /dev/null && \
@@ -10,7 +20,7 @@ for ((i = 0 ; i < ${#NIFACE[*]} ; i++)); do
   ASSNIP[i]="$(ip addr show ${NIFACE[i]} | sed 's/   *//g;s/\/[0-9]*//g' | grep 'inet ' | cut -d\  -f2 | sed ':a;N;$!ba;s/\n/ /g')"
   [ -z "${ASSNIP[i]}" ] && ASSNIP[i]="00.00.00.00"
   [ "$(cat /sys/class/net/${NIFACE[i]}/carrier 2> /dev/null)" == "1" ] &&
-    DHCPIP[i]="$(dhcpcd -t 5 -T ${NIFACE[i]} 2> /dev/null | grep offered | cut -d\  -f3)"
+  DHCPIP[i]="$(dhcpcd -t 5 -T ${NIFACE[i]} 2> /dev/null | grep offered | cut -d\  -f3)"
   [ -z "${DHCPIP[i]}" ] && DHCPIP[i]="00.00.00.00"
   if type ethtool &> /dev/null; then
     LNKSPD[i]="$(ethtool ${NIFACE[i]} 2> /dev/null | grep Speed | sed 's/\t//g;s/\///g;s/Mbs/M/g;s/1000M/1G/g' | cut -d\  -f2)"
@@ -38,6 +48,12 @@ for ((i = 0 ; i < ${#NIFACE[*]} ; i++)); do
     UFOUND[i]="No"
     UDRDEV[i]=""
   fi
+
+  if ${OBSFCT}; then
+    MACADD[i]="${MACADD[i]%:??:??:??}:XX:XX:XX"
+    [ "${ASSNIP[i]}" != "00.00.00.00" ] && ASSNIP[i]="${ASSNIP[i]%.*.*}.X.X"
+    [ "${DHCPIP[i]}" != "00.00.00.00" ] && DHCPIP[i]="${DHCPIP[i]%.*.*}.X.X"
+  fi
   
 done
 
@@ -51,6 +67,8 @@ NAMING+=" Network Interface Names.  "
 #[ -n "${UDRNIF}" ] && echo "Found${UDRNIF}in /etc/udev/rules.d."
   
 LOOKUP="$(dig +short ${HOSTNAME})"
+[ ${OBSFCT} ] && LOOKUP="${LOOKUP%.*.*}.X.X"
+
 if [ -n "${LOOKUP}" ]; then
   LURSLT="DNS for ${HOSTNAME} is ${LOOKUP}"
 else
