@@ -2,7 +2,7 @@
 if [ `which gcc 2> /dev/null` ]; then
   if [ "$( echo -e "4.9\n$(gcc --version | grep gcc | cut -d\  -f3)" | sort -V | head -n 1 )" == "4.9" ]; then
     CKINFO="$(gcc -c -Q -march=native --help=target | grep 'march=\|mtune=' | sed ':a;N;$!ba;s/\t/ /g;s/  *//g;s/-m/m/g;s/\n/ /g')"
-    echo $CKINFO
+    echo -n "${CKINFO}: "
     GMARCH=${CKINFO% *=*}
     GMARCH=${GMARCH#*=}
     case ${GMARCH} in
@@ -25,7 +25,7 @@ if [ `which gcc 2> /dev/null` ]; then
     
       *)    echo -n ck-generic ;;
     esac
-    echo ' recommended.'
+    echo -n ' recommended, '
   else
     echo "GCC version >=4.9 required."
   fi
@@ -33,7 +33,7 @@ else
   echo "GCC is not installed."
 fi
 
-CKINST="No ck package $(pacman -Qqs linux-ck | sed 's/ck$/ck-generic/g' | grep -v 'broadcom\|headers\|nvidia\|virtualbox') installed."
-CKINST="${CKINST/No ck package linux/linux}"
+CKINST="no ck package $(pacman -Qqs linux-ck | sed 's/ck$/ck-generic/g' | grep -v 'broadcom\|headers\|nvidia\|virtualbox') installed."
+CKINST="${CKINST/no ck package linux/linux}"
 CKINST="${CKINST/linux-/}"
 echo $CKINST >&2
