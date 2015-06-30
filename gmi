@@ -25,7 +25,7 @@ LCC=$(cat /proc/cpuinfo | grep -c '^processor')
 DST="$(uname -m | sed 's/x86_64/x64/g;s/i686/x86/g') $(cat /etc/os-release | grep PRETTY_NAME | cut -d\" -f2)"
 CPU="$(lscpu | grep '^Arch\|^Vendor ID\|^Model name' | head -n 3 | cut -d: -f2 | sed 's/   *//g;s/^ //g;s/@.*//g;s/(TM)//gI;s/(R)//gI;s/ [0-9]*MHz//g;s/ CPU//gI' | sed ':a;N;$!ba;s/\n/ /g' | \
 sed "s/x86_64/x64/g;s/i686/x86/g;" | \
-sed 's/CentaurHauls //g;s/GenuineIntel/Intel/g;s/Intel Atom/Atom/g;s/Intel Celeron/Celeron/g;s/Pentium /P-/g;s/ with Radeon HD Graphics//g;s/AuthenticAMD //g;s/Dual Core //g;s/ Processor//g;s/ version [0-9]*\.[0-9]*/ /g')"
+sed 's/CentaurHauls //g;s/GenuineIntel/Intel/g;s/Intel Atom/Atom/g;s/Intel Celeron/Celeron/g;s/Pentium /P-/g;s/ with Radeon HD Graphics//g;s/AuthenticAMD //g;s/Dual Core //g;s/ Processor//g;s/ version [0-9]*\.[0-9]*//g')"
 
 [ $(expr $PCC \* 2) == $LCC ] && HTT="HT"
 
