@@ -67,7 +67,7 @@ NAMING+=" Network Interface Names.  "
 #[ -n "${UDRNIF}" ] && echo "Found${UDRNIF}in /etc/udev/rules.d."
   
 LOOKUP="$(dig +short ${HOSTNAME})"
-[ ${OBSFCT} ] && LOOKUP="${LOOKUP%.*.*}.X.X"
+[ ${OBSFCT} ] && [ -n "${LOOKUP}" ] && LOOKUP="${LOOKUP%.*.*}.X.X"
 
 if [ -n "${LOOKUP}" ]; then
   LURSLT="DNS for ${HOSTNAME} is ${LOOKUP}"
