@@ -49,7 +49,7 @@ for ((i = 0 ; i < ${#NIFACE[*]} ; i++)); do
     UDRDEV[i]=""
   fi
 
-  if ${OBSFCT}; then
+  if [ ${OBSFCT} ]; then
     MACADD[i]="${MACADD[i]%:??:??:??}:XX:XX:XX"
     [ "${ASSNIP[i]}" != "00.00.00.00" ] && ASSNIP[i]="${ASSNIP[i]%.*.*}.X.X"
     [ "${DHCPIP[i]}" != "00.00.00.00" ] && DHCPIP[i]="${DHCPIP[i]%.*.*}.X.X"
