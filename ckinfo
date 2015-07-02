@@ -36,4 +36,4 @@ fi
 CKINST="no ck package $(pacman -Qqs linux-ck | sed 's/ck$/ck-generic/g' | grep -v 'broadcom\|headers\|nvidia\|virtualbox') installed."
 CKINST="${CKINST/no ck package linux/linux}"
 CKINST="${CKINST/linux-/}"
-echo $CKINST >&2
+echo $CKINST
