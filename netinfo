@@ -15,56 +15,11 @@ NIFACE=( $(\ls -1 /sys/class/net | grep -v lo | sort -V | tr '\n' ' ') )
 ! type ethtool &> /dev/null && ! type mii-tool &> /dev/null && \
   echo "Could not find ethtool nor mii-tool.  Link speeds will be unavailable."
 
-for ((i = 0 ; i < ${#NIFACE[*]} ; i++)); do
-  MACADD[i]="$(cat /sys/class/net/${NIFACE[i]}/address)"
-  ASSNIP[i]="$(ip addr show ${NIFACE[i]} | sed 's/   *//g;s/\/[0-9]*//g' | grep 'inet ' | cut -d\  -f2 | sed ':a;N;$!ba;s/\n/ /g')"
-  [ -z "${ASSNIP[i]}" ] && ASSNIP[i]="00.00.00.00"
-  [ "$(cat /sys/class/net/${NIFACE[i]}/carrier 2> /dev/null)" == "1" ] &&
-  DHCPIP[i]="$(dhcpcd -t 5 -T ${NIFACE[i]} 2> /dev/null | grep offered | cut -d\  -f3)"
-  [ -z "${DHCPIP[i]}" ] && DHCPIP[i]="00.00.00.00"
-  if type ethtool &> /dev/null; then
-    LNKSPD[i]="$(ethtool ${NIFACE[i]} 2> /dev/null | grep Speed | sed 's/\t//g;s/\///g;s/Mbs/M/g;s/1000M/1G/g' | cut -d\  -f2)"
-  elif type mii-tool &> /dev/null; then
-    LNKSPD[i]="$(mii-tool ${NIFACE[i]} 2> /dev/null | sed 's/.*negotiated \([0-9]*\).*/\1M/g;s/1000M/1G/g')"
-  else
-    LNKSPD[i]="xxxxxxx"
-  fi
-
-  NCARUL[i]="$(grep -i "Interface=${NIFACE[i]}" /etc/netctl/* 2> /dev/null | cut -d: -f1 )"
-  [ -n "${NCARUL[i]}" ] && CFOUND[i]="${NIFACE[i]}" || CFOUND[i]="No"
-
-  NDARUL[i]="$(grep -i "Name=${NIFACE[i]}" /etc/systemd/network/* 2> /dev/null | cut -d: -f1 )"
-  [ -n "${NDARUL[i]}" ] && DFOUND[i]="${NIFACE[i]}" || DFOUND[i]="No"
-
-  UDRULE[i]="$(grep -i ATTR{address}==\"${MACADD[i]}\" /etc/udev/rules.d/* 2> /dev/null | cut -d: -f1 )"
-  if [ -n "${UDRULE[i]}" ]; then
-    UFOUND[i]="Yes"
-    UDRDEV[i]="$(cat ${UDRULE} | grep -i ATTR{address}==\"${MACADD[i]}\" | sed 's/.*NAME="\(.*\)".*/\1/g')"
-    NCURUL[i]="$(grep -i "Interface=${UDRDEV[i]}" /etc/netctl/* 2> /dev/null | cut -d: -f1 )"
-    [ -n "${NCURUL[i]}" ] && CFOUND[i]="${UDRDEV[i]}"
-    NDURUL[i]="$(grep -i "Interface=${UDRDEV[i]}" /etc/netctl/* 2> /dev/null | cut -d: -f1 )"
-    [ -n "${NDURUL[i]}" ] && CFOUND[i]="${UDRDEV[i]}"
-  else
-    UFOUND[i]="No"
-    UDRDEV[i]=""
-  fi
-
-  if [ ${OBSFCT} ]; then
-    MACADD[i]="${MACADD[i]%:??:??:??}:XX:XX:XX"
-    [ "${ASSNIP[i]}" != "00.00.00.00" ] && ASSNIP[i]="${ASSNIP[i]%.*.*}.X.X"
-    [ "${DHCPIP[i]}" != "00.00.00.00" ] && DHCPIP[i]="${DHCPIP[i]%.*.*}.X.X"
-  fi
-  
-done
-
 printf '=%.0s' {1..79}; echo ''
 
 NAMING="Using "
 [ -e /etc/udev/rules.d/80-net-setup-link.rules ] && NAMING+="Kernel" || NAMING+="Predictable"
 NAMING+=" Network Interface Names.  "
-  
-#UDRNIF=" $(cat /etc/udev/rules.d/* | grep ATTR{address} | sed 's/.*NAME="\(.*\)"/\1/g' | sort -Vu | tr '\n' ' ')"
-#[ -n "${UDRNIF}" ] && echo "Found${UDRNIF}in /etc/udev/rules.d."
   
 LOOKUP="$(dig +short ${HOSTNAME})"
 [ ${OBSFCT} ] && [ -n "${LOOKUP}" ] && LOOKUP="${LOOKUP%.*.*}.X.X"
@@ -76,14 +31,71 @@ else
 fi
 
 printf "%-43s %35s\n" "${NAMING}" "${LURSLT}"
-
+  
 printf '=%.0s' {1..79}; echo ''
 echo -e '---MAC ADDRESS--- CUR-DEV UDR-DEV LSPD ASSIGNED-IP DHCP-LOOKUP NETCTL  NETWRKD'
 printf '=%.0s' {1..79}; echo ''
-  
+
 for ((i = 0 ; i < ${#NIFACE[*]} ; i++)); do
-  [ $(expr length ${ASSNIP[i]}) -gt 11 ] && FMTAIP="…${ASSNIP[i]: -10}" || FMTAIP="${ASSNIP[i]}"
-  [ $(expr length ${DHCPIP[i]}) -gt 11 ] && FMTDIP="…${DHCPIP[i]: -10}" || FMTDIP="${DHCPIP[i]}"
-  printf "%17s %-7s %-7s %4s %11s %11s %-7s %-7s\n" "${MACADD[i]}" "${NIFACE[i]}" "${UDRDEV[i]}" "${LNKSPD[i]}" "${FMTAIP}" "${FMTDIP}" "${CFOUND[i]}" "${DFOUND[i]}"
+
+  MACADD="$(cat /sys/class/net/${NIFACE[i]}/address)"
+  [ ${OBSFCT} ] && FMTMAC="${MACADD%:??:??:??}:XX:XX:XX" || FMTMAC="${MACADD}"
+  printf "%17s " "${FMTMAC}"
+  
+  printf "%-7s " "${NIFACE[i]}"
+  
+  UDRDEV="$(grep -i ATTR{address}==\"${MACADD}\" /etc/udev/rules.d/* 2> /dev/null | sed 's/\(.*NAME="\)\(.*\)\(".*\)/\2/g' )"
+  
+  printf "%-7s " "${UDRDEV}"
+  
+  if type ethtool &> /dev/null; then
+    printf "%4s " "$(ethtool ${NIFACE[i]} 2> /dev/null | grep Speed | sed 's/\t//g;s/\///g;s/Mbs/M/g;s/1000M/1G/g' | cut -d\  -f2)"
+  elif type mii-tool &> /dev/null; then
+    printf "%4s " "$(mii-tool ${NIFACE[i]} 2> /dev/null | sed 's/.*negotiated \([0-9]*\).*/\1M/g;s/1000M/1G/g')"
+  else
+    echo '---- '
+  fi
+
+  [ "$(cat /sys/class/net/${NIFACE[i]}/carrier 2> /dev/null)" == "1" ] &&
+    ASSNIP="$(ip addr show ${NIFACE[i]} | sed 's/   *//g;s/\/[0-9]*//g' | grep 'inet ' | cut -d\  -f2 | sed ':a;N;$!ba;s/\n/ /g')"
+  [ -z "${ASSNIP}" ] && ASSNIP="00.00.00.00"
+  [ ${OBSFCT} ] && [ "${ASSNIP}" != "00.00.00.00" ] && ASSNIP="${ASSNIP%.*.*}.X.X"
+  [ $(expr length ${ASSNIP}) -gt 11 ] && FMTAIP="…${ASSNIP: -10}" || FMTAIP="${ASSNIP}"
+  printf "%11s " "${FMTAIP}"
+  
+  [ "$(cat /sys/class/net/${NIFACE[i]}/carrier 2> /dev/null)" == "1" ] &&
+    DHCPIP="$(dhcpcd -t 5 -T ${NIFACE[i]} 2> /dev/null | grep 'offered\|leased' | cut -d\  -f3)"
+  [ -z "${DHCPIP}" ] && DHCPIP="00.00.00.00"
+  [ ${OBSFCT} ] && [ "${DHCPIP}" != "00.00.00.00" ] && DHCPIP="${DHCPIP%.*.*}.X.X"
+  [ $(expr length ${DHCPIP}) -gt 11 ] && FMTDIP="…${DHCPIP: -10}" || FMTDIP="${DHCPIP}"
+  printf "%11s " "${FMTDIP}"
+
+  [ -n "${UDRDEV}" ] &&
+    [ -n "$(grep -i "Interface=${UDRDEV}" /etc/netctl/* 2> /dev/null | cut -d: -f1 )" ] &&
+      NCTRL="${UDRDEV}"
+
+  [ -z "${NCTLRL}" ] &&
+    [ -n "$(grep -i "Interface=${NIFACE[i]}" /etc/netctl/* 2> /dev/null | cut -d: -f1 )" ] &&
+      NCTLRL="${NIFACE[i]}"
+  
+  [ -z "${NCTLRL}" ] && NCTLRL="No"
+  
+  printf "%-7s " "${NCTLRL}"
+  
+  [ -n "${UDRDEV}" ] &&
+    [ -n "$(grep -i "Name=${UDRDEV}" /etc/netctl/* 2> /dev/null | cut -d: -f1 )" ] &&
+      NWKDRL="${UDRDEV}"
+
+  [ -z "${NWKDRL}" ] &&
+    [ -n "$(grep -i "Name=${NIFACE[i]}" /etc/systemd/network/* 2> /dev/null | cut -d: -f1 )" ] &&
+      NWKDRL="${NIFACE[i]}"
+
+  [ -z "${NWKDRL}" ] && NWKDRL="No"
+  
+  printf "%-7s\n" "${NWKDRL}"
+  
+  unset MACADD FMTMAC UDRDEV ASSNIP FMTAIP DHCPIP FMTDIP NCTLRL NWKDRL
+  
 done
+
 printf '=%.0s' {1..79}; echo ''
