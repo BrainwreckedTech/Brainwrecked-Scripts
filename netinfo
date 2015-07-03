@@ -20,7 +20,7 @@ printf '=%.0s' {1..79}; echo ''
 NAMING="Using "
 [ -e /etc/udev/rules.d/80-net-setup-link.rules ] && NAMING+="Kernel" || NAMING+="Predictable"
 NAMING+=" Network Interface Names.  "
-  
+
 LOOKUP="$(dig +short ${HOSTNAME})"
 [ ${OBSFCT} ] && [ -n "${LOOKUP}" ] && LOOKUP="${LOOKUP%.*.*}.X.X"
 
@@ -31,7 +31,7 @@ else
 fi
 
 printf "%-43s %35s\n" "${NAMING}" "${LURSLT}"
-  
+
 printf '=%.0s' {1..79}; echo ''
 echo -e '---MAC ADDRESS--- CUR-DEV UDR-DEV LSPD ASSIGNED-IP DHCP-LOOKUP NETCTL  NETWRKD'
 printf '=%.0s' {1..79}; echo ''
@@ -41,13 +41,13 @@ for ((i = 0 ; i < ${#NIFACE[*]} ; i++)); do
   MACADD="$(cat /sys/class/net/${NIFACE[i]}/address)"
   [ ${OBSFCT} ] && FMTMAC="${MACADD%:??:??:??}:XX:XX:XX" || FMTMAC="${MACADD}"
   printf "%17s " "${FMTMAC}"
-  
+
   printf "%-7s " "${NIFACE[i]}"
-  
+
   UDRDEV="$(grep -i ATTR{address}==\"${MACADD}\" /etc/udev/rules.d/* 2> /dev/null | sed 's/\(.*NAME="\)\(.*\)\(".*\)/\2/g' )"
-  
+
   printf "%-7s " "${UDRDEV}"
-  
+
   if type ethtool &> /dev/null; then
     printf "%4s " "$(ethtool ${NIFACE[i]} 2> /dev/null | grep Speed | sed 's/\t//g;s/\///g;s/Mbs/M/g;s/1000M/1G/g' | cut -d\  -f2)"
   elif type mii-tool &> /dev/null; then
@@ -62,7 +62,7 @@ for ((i = 0 ; i < ${#NIFACE[*]} ; i++)); do
   [ ${OBSFCT} ] && [ "${ASSNIP}" != "00.00.00.00" ] && ASSNIP="${ASSNIP%.*.*}.X.X"
   [ $(expr length ${ASSNIP}) -gt 11 ] && FMTAIP="…${ASSNIP: -10}" || FMTAIP="${ASSNIP}"
   printf "%11s " "${FMTAIP}"
-  
+
   [ "$(cat /sys/class/net/${NIFACE[i]}/carrier 2> /dev/null)" == "1" ] &&
     DHCPIP="$(dhcpcd -t 5 -T ${NIFACE[i]} 2> /dev/null | grep 'offered\|leased' | cut -d\  -f3)"
   [ -z "${DHCPIP}" ] && DHCPIP="00.00.00.00"
@@ -77,11 +77,11 @@ for ((i = 0 ; i < ${#NIFACE[*]} ; i++)); do
   [ -z "${NCTLRL}" ] &&
     [ -n "$(grep -i "^Interface=${NIFACE[i]}$" /etc/netctl/* 2> /dev/null | cut -d: -f1 )" ] &&
       NCTLRL="${NIFACE[i]}"
-  
+
   [ -z "${NCTLRL}" ] && NCTLRL="No"
-  
+
   printf "%-7s " "${NCTLRL}"
-  
+
   [ -n "${UDRDEV}" ] &&
     [ -n "$(grep -i "^Name=${UDRDEV}$" /etc/systemd/network/* 2> /dev/null | cut -d: -f1 )" ] &&
       NWKDRL="${UDRDEV}"
@@ -91,11 +91,11 @@ for ((i = 0 ; i < ${#NIFACE[*]} ; i++)); do
       NWKDRL="${NIFACE[i]}"
 
   [ -z "${NWKDRL}" ] && NWKDRL="No"
-  
+
   printf "%-7s\n" "${NWKDRL}"
-  
+
   unset MACADD FMTMAC UDRDEV ASSNIP FMTAIP DHCPIP FMTDIP NCTLRL NWKDRL
-  
+
 done
 
 printf '=%.0s' {1..79}; echo ''
