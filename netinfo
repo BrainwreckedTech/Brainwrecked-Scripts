@@ -71,11 +71,11 @@ for ((i = 0 ; i < ${#NIFACE[*]} ; i++)); do
   printf "%11s " "${FMTDIP}"
 
   [ -n "${UDRDEV}" ] &&
-    [ -n "$(grep -i "Interface=${UDRDEV}" /etc/netctl/* 2> /dev/null | cut -d: -f1 )" ] &&
-      NCTRL="${UDRDEV}"
+    [ -n "$(grep -i "^Interface=${UDRDEV}$" /etc/netctl/* 2> /dev/null | cut -d: -f1 )" ] &&
+      NCTLRL="${UDRDEV}"
 
   [ -z "${NCTLRL}" ] &&
-    [ -n "$(grep -i "Interface=${NIFACE[i]}" /etc/netctl/* 2> /dev/null | cut -d: -f1 )" ] &&
+    [ -n "$(grep -i "^Interface=${NIFACE[i]}$" /etc/netctl/* 2> /dev/null | cut -d: -f1 )" ] &&
       NCTLRL="${NIFACE[i]}"
   
   [ -z "${NCTLRL}" ] && NCTLRL="No"
@@ -83,11 +83,11 @@ for ((i = 0 ; i < ${#NIFACE[*]} ; i++)); do
   printf "%-7s " "${NCTLRL}"
   
   [ -n "${UDRDEV}" ] &&
-    [ -n "$(grep -i "Name=${UDRDEV}" /etc/netctl/* 2> /dev/null | cut -d: -f1 )" ] &&
+    [ -n "$(grep -i "^Name=${UDRDEV}$" /etc/systemd/network/* 2> /dev/null | cut -d: -f1 )" ] &&
       NWKDRL="${UDRDEV}"
 
   [ -z "${NWKDRL}" ] &&
-    [ -n "$(grep -i "Name=${NIFACE[i]}" /etc/systemd/network/* 2> /dev/null | cut -d: -f1 )" ] &&
+    [ -n "$(grep -i "^Name=${NIFACE[i]}$" /etc/systemd/network/* 2> /dev/null | cut -d: -f1 )" ] &&
       NWKDRL="${NIFACE[i]}"
 
   [ -z "${NWKDRL}" ] && NWKDRL="No"
