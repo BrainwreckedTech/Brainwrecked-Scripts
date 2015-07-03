@@ -61,7 +61,7 @@ for ((i = 0 ; i < ${#NIFACE[*]} ; i++)); do
 
   UDRDEV="$(grep -i ATTR{address}==\"${MACADD}\" /etc/udev/rules.d/* 2> /dev/null | sed 's/\(.*NAME="\)\(.*\)\(".*\)/\2/g' )"
 
-  printf "%-7s " "${UDRDEV}"1
+  printf "%-7s " "${UDRDEV}"
 
   if type ethtool &> /dev/null; then
     printf "%4s " "$(ethtool ${NIFACE[i]} 2> /dev/null | grep Speed | sed 's/\t//g;s/\///g;s/Mbs/M/g;s/1000M/1G/g' | cut -d\  -f2)"
