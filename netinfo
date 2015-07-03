@@ -1,4 +1,19 @@
 #!/bin/bash
+#########################################################################
+#	NetInfo - Display network configuration information		#
+#	Copyright (C) 2015 Paul A. Hinchberger III			#
+#########################################################################
+#	This program is free software: you can redistribute it and/	#
+#	or modify it under the terms of the GNU GPLv3 as published	#
+#	by the Free Software Foundation.				#
+#									#
+#	This program is distributed in the hope that it will be		#
+#	useful, but WITHOUT ANY WARRANTY; without even the implied	#
+#	warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR		#
+#	PURPOSE.  See the GNU GPLv3 for more details.			#
+#									#
+#	See <http://www.gnu.org/licenses/> for details.			#
+#########################################################################
 
 OSBFCT=false
 
@@ -46,7 +61,7 @@ for ((i = 0 ; i < ${#NIFACE[*]} ; i++)); do
 
   UDRDEV="$(grep -i ATTR{address}==\"${MACADD}\" /etc/udev/rules.d/* 2> /dev/null | sed 's/\(.*NAME="\)\(.*\)\(".*\)/\2/g' )"
 
-  printf "%-7s " "${UDRDEV}"
+  printf "%-7s " "${UDRDEV}"1
 
   if type ethtool &> /dev/null; then
     printf "%4s " "$(ethtool ${NIFACE[i]} 2> /dev/null | grep Speed | sed 's/\t//g;s/\///g;s/Mbs/M/g;s/1000M/1G/g' | cut -d\  -f2)"

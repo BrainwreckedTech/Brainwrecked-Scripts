@@ -1,4 +1,20 @@
 #!/bin/bash
+#########################################################################
+#	CKInfo - Display info related to repo-ck kernel packages	#
+#	Copyright (C) 2015 Paul A. Hinchberger III			#
+#########################################################################
+#	This program is free software: you can redistribute it and/	#
+#	or modify it under the terms of the GNU GPLv3 as published	#
+#	by the Free Software Foundation.				#
+#									#
+#	This program is distributed in the hope that it will be		#
+#	useful, but WITHOUT ANY WARRANTY; without even the implied	#
+#	warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR		#
+#	PURPOSE.  See the GNU GPLv3 for more details.			#
+#									#
+#	See <http://www.gnu.org/licenses/> for details.			#
+#########################################################################
+
 if [ `which gcc 2> /dev/null` ]; then
   if [ "$( echo -e "4.9\n$(gcc --version | grep gcc | cut -d\  -f3)" | sort -V | head -n 1 )" == "4.9" ]; then
     CKINFO="$(gcc -c -Q -march=native --help=target | grep 'march=\|mtune=' | sed ':a;N;$!ba;s/\t/ /g;s/  *//g;s/-m/m/g;s/\n/ /g')"
