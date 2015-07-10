@@ -45,7 +45,7 @@ else
   LURSLT="Could not look up ${HOSTNAME}."
 fi
 
-printf "%-43s %35s\n" "${NAMING}" "${LURSLT}"
+printf "%-44s %34s\n" "${NAMING}" "${LURSLT}"
 
 printf '=%.0s' {1..79}; echo ''
 echo -e '---MAC ADDRESS--- CUR-DEV UDR-DEV LSPD ASSIGNED-IP DHCP-LOOKUP NETCTL  NETWRKD'
@@ -79,7 +79,7 @@ for ((i = 0 ; i < ${#NIFACE[*]} ; i++)); do
   printf "%11s " "${FMTAIP}"
 
   [ "$(cat /sys/class/net/${NIFACE[i]}/carrier 2> /dev/null)" == "1" ] &&
-    DHCPIP="$(dhcpcd -t 5 -T ${NIFACE[i]} 2> /dev/null | grep 'offered\|leased' | cut -d\  -f3)"
+    DHCPIP="$(dhcpcd -t 5 -T ${NIFACE[i]} 2> /dev/null | grep 'offered\|leased\| rebinding ' | sed 's/lease of //g' | cut -d\  -f3 | sort -u)"
   [ -z "${DHCPIP}" ] && DHCPIP="00.00.00.00"
   [ ${OBSFCT} ] && [ "${DHCPIP}" != "00.00.00.00" ] && DHCPIP="${DHCPIP%.*.*}.X.X"
   [ $(expr length ${DHCPIP}) -gt 11 ] && FMTDIP="…${DHCPIP: -10}" || FMTDIP="${DHCPIP}"
