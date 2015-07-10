@@ -1,0 +1,45 @@
+#!/bin/sh
+
+DEVICES="$(lsblk -l -x NAME -o NAME | tail -n +2 | cut -d\  -f1 | grep -v '[0-9]' | tr '\n' ' ') $(find /dev -maxdepth 1 -type b -name 'md*'|rev|cut -d/ -f1|rev) $(find /dev -maxdepth 1 -type b -name 'dm-*'|rev|cut -d/ -f1|rev)"
+
+case ${1} in
+  t)
+
+    sudo echo -n '╔══════╤'
+    for DEVICE in $DEVICES; do
+      printf "%6s╤" "══════"
+    done
+
+    echo -ne '\b╗\n║DEVICE│'
+    for DEVICE in $DEVICES; do
+      printf "%6s│" "${DEVICE}"
+    done
+
+    echo -ne '\b║\n╟──────┼'
+    for DEVICE in $DEVICES; do
+      printf "%6s┼" "──────"
+    done
+
+    echo -ne '\b╢\n║MB/sec│'
+    for DEVICE in $DEVICES; do
+      printf "%6s│" "$(sudo hdparm -t --direct /dev/${DEVICE} | grep 'MB/sec' | cut -d= -f2 | sed 's/\s\s*//g;s/MB\/sec//g')"
+    done
+
+    echo -ne '\b║\n╚══════╧'
+    for DEVICE in $DEVICES; do
+      printf "%6s╧" "══════"
+    done
+
+    echo -ne '\b╝\n'
+  ;;
+  *)
+
+    echo -n "DISK SPEED (MB/s): "
+    for DEVICE in $DEVICES; do
+      echo -n "${DEVICE}="
+      echo -n "$(sudo hdparm -t --direct /dev/${DEVICE} | grep 'MB/sec' | cut -d= -f2 | sed 's/\s\s*//g;s/MB\/sec//g'),"
+    done
+    echo -e '\b \b'
+
+  ;;
+esac

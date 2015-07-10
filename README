@@ -19,6 +19,8 @@ cp2chroot                 Copy bins and dependent libs to chroot
 
 cur-linux-ver		  Prints current linux kernel version
 
+diskspeed                 Finds disks and displays their speed with hdparm
+
 dump-disk-info		  Dump Disk Info
 
 get-systemd-services      List systemd services (name only, skip systemd*)
