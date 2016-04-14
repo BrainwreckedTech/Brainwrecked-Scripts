@@ -7,8 +7,6 @@ archtype		  List system CPU architecture, reported by GCC
 
 backup-root-rsync	  Backup root partition to another PC via rsync
 
-bigpkg                    List space pkgs are taking up (Allan McRae)
-
 ckinfo                    Lists system's CPU info as needed by the
 			  repo-ck repository for Arch Linux
 
@@ -28,6 +26,9 @@ get-systemd-services      List systemd services (name only, skip systemd*)
 git-auto-add-commit-push  Add files to, commit, and push to a git repo
 
 gmi                       Get Machine Info - Prints a line with HW/OS info
+
+greatpkg                  List space pkgs are taking up
+                          bbs.archlinux.org/viewtopic.php?pid=1493345#p1493345
 
 gua			  Guided User Add
 
