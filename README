@@ -63,3 +63,6 @@ ssh-authlock-toggle       Toggle .ssh directory/file security
 sshd-passwds-toggle	  Toggle the acceptance of SSH passwords
 
 startvbvm		  Attach storage to a VB VM, run, then detach
+
+update-nano-syntax-highlight   Update /etc/nanorc after new release of
+                               nano-syntax-highlighting-git on AUR

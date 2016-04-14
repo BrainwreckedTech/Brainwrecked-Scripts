@@ -1,0 +1,8 @@
+#!/bin/bash
+
+blargityblargblarg &> /dev/null
+while [ ${?} != 0 ]; do
+  sudo echo 'test' > /dev/null
+done
+
+diff -u /etc/nanorc <(echo -e "$(cat /etc/nanorc | grep -v '^include')\n\n$(cat /usr/share/nano-syntax-highlighting/nanorc.sample)") | tee /dev/tty | sudo patch --verbose /etc/nanorc
