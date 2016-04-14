@@ -5,7 +5,7 @@
 /usr/bin/sudo /scr/update-reflector "United States"
 
 # Build command to execute
-cmd="/usr/bin/sudo /usr/bin/pacman -Syu"
+cmd="/usr/bin/sudo /usr/bin/pacman -Syu --noconfirm"
 
 # If local shared cache exists, use it
 [[ -d /mnt/nfs/pacman/pkg ]] && cmd+=" --cachedir /mnt/nfs/pacman/pkg"
@@ -13,7 +13,22 @@ cmd="/usr/bin/sudo /usr/bin/pacman -Syu"
 # Execute command
 eval "$cmd"
 
-tty -s && type pacaur > /dev/null && pacaur -u --devel --noedit
+if [ ${?} != 0 ]; then
+  echo ":: Pacman failed."
+else
+  if tty -s; then
+    if type pacaur &> /dev/null; then
+      if [ ! -d /pacaur ]; then
+        sudo mkdir -p /pacaur
+        sudo chmod 1777 /pacaur
+        if [ ! -d /pacaur/${USER} ]; then
+          mkdir /pacaur/${USER}
+        fi
+      fi
+    AURDEST=/pacaur/${USER} pacaur -u --devel --noedit --needed --ignore-ood --noconfirm
+    fi
+  fi
+fi
 
 # Adds apt-like warning of packages no longer needed if TTY
 if tty -s; then
@@ -23,12 +38,12 @@ if tty -s; then
   echo -e '\e[1;34m:: \e[1;37mThe following packages are no longer required.  '
   #echo -e  'Use \e[1;33mpacman -Rs $(pacman -Qtdq)\e[1;37m to remove them.\e[0m'
   echo "${orphed}"
-  read -n 1 -t 60 -p "Remove orphans now? [y/N]: " RMORPH
+  read -n 1 -t 300 -p "Remove orphans now? [y/N] " RMORPH
   echo ""
   case ${RMORPH} in
-   y|Y) /usr/bin/sudo /usr/bin/pacman -Rs $(/usr/bin/pacman -Qtdq) ;;
+   y|Y) /usr/bin/sudo /usr/bin/pacman --noconfirm -Rs $(/usr/bin/pacman -Qtdq) ;;
    n|N) echo "Not removing orphans at this time." ;;
-   *) echo "60-second timeout reached.  Not removing orphans." ;;
+   *) echo "5-minute timeout reached.  Not removing orphans." ;;
   esac
  fi
 fi
