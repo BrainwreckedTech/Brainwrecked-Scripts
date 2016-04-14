@@ -1,6 +1,6 @@
 #!/bin/sh
 
-DEVICES="$(lsblk -l -x NAME -o NAME | tail -n +2 | cut -d\  -f1 | grep -v '[0-9]' | tr '\n' ' ') $(find /dev -maxdepth 1 -type b -name 'md*'|rev|cut -d/ -f1|rev) $(find /dev -maxdepth 1 -type b -name 'dm-*'|rev|cut -d/ -f1|rev)"
+DEVICES="$(lsblk -l -x NAME -o NAME | tail -n +2 | cut -d\  -f1 | grep -v '[0-9]' | tr '\n' ' ') $(find /dev -maxdepth 1 -type b -name 'md*'|sort -V|rev|cut -d/ -f1|rev) $(find /dev -maxdepth 1 -type b -name 'dm-*'|sort -V|rev|cut -d/ -f1|rev)"
 
 case ${1} in
   t)
@@ -34,7 +34,7 @@ case ${1} in
   ;;
   *)
 
-    echo -n "DISK SPEED (MB/s): "
+    sudo echo -n "DISK SPEED (MB/s): "
     for DEVICE in $DEVICES; do
       echo -n "${DEVICE}="
       echo -n "$(sudo hdparm -t --direct /dev/${DEVICE} | grep 'MB/sec' | cut -d= -f2 | sed 's/\s\s*//g;s/MB\/sec//g'),"
