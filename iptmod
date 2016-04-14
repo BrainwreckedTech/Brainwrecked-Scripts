@@ -24,7 +24,7 @@ function openports() {
 for ADDR in $2;  do
   for SRVC in $3; do
     [[ $SRVC == pop3  || $SRVC == all ]] && openports "110"
-    [[ $SRVC == samba || $SRVC == all ]] && openports "137:139"
+    [[ $SRVC == samba || $SRVC == all ]] && openports "137:139,445"
     [[ $SRVC == nfs   || $SRVC == all ]] && openports "111,1110,2049,3095,4045"
     [[ $SRVC == dlna  || $SRVC == all ]] && openports "8200"
     [[ $SRVC == btwsq || $SRVC == all ]] && openports "8888"
