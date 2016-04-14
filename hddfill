@@ -1,0 +1,22 @@
+#!/bin/bash
+
+sudo echo "garbage" > /dev/null
+while [ $? -ne 0 ]; do !!; done
+
+SEC=falase
+
+for ARG in "$@"; do
+  case "${ARG}" in
+    "--secure") SEC=true        ;;
+             *) [[ -b "${ARG}" ]] && DVC+=("${ARG}") || ( echo "${ARG} is not a block device"; exit 1 ) ;;
+  esac
+done
+
+echo -n "Filling ${DVC[@]} with "
+${SEC} && echo "random data" || echo "zeros"
+
+for DEV in "${DVC[@]}"; do
+  echo "${DEV}:"
+  ${SEC} && openssl enc -aes-256-ctr -pass pass:"$(dd if=/dev/urandom bs=128 count=1 2>/dev/null | base64)" -nosalt </dev/zero | sudo dd of=${DEV} bs=4M status=progress
+  ${SEC} || sudo dd if=/dev/zero of=${DEV} bs=4M status=progress
+done
