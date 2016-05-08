@@ -30,4 +30,9 @@ for GROUP in audio adbusers camera cdemu disk floppy games kvm locate lp network
     echo "Group $GROUP is not defined in /etc/group."
   fi
 done
-useradd $HOMEOPTION -g users -G `echo ${USERGROUPS[@]:1:${#USERGROUPS[@]}} | tr ' ' ','` $NEWUSER -u $USERID
+
+if [[ -n ${USERGROUPS[@]} ]]; then
+  useradd $HOMEOPTION -g users $NEWUSER -u $USERID
+else
+  useradd $HOMEOPTION -g users -G `echo ${USERGROUPS[@]:1:${#USERGROUPS[@]}} | tr ' ' ','` $NEWUSER -u $USERID
+fi
