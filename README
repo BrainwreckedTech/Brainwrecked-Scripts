@@ -6,6 +6,9 @@ archtype
 backup-root-rsync
 > Backup root partition to another PC via rsync
 
+bdmap
+> Maps /dev/sd? to ata? and usb?
+
 ckinfo
 > Lists system's CPU info as needed by the repo-ck repository for Arch Linux
 
