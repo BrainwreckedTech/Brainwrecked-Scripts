@@ -27,6 +27,9 @@ diskspeed
 dump-disk-info
 > Dump Disk Info
 
+erc
+> Edit Root Crontab.  Shortcut for editing root's crontab with nano.
+
 gap
 > Get AUR Package.  Shortcut for downloading and extracting AUR packages for manual builds.
 
