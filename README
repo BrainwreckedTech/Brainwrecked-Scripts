@@ -1,75 +1,92 @@
-This repository is just a collection of scripts that I've come up with 
-and/or found over time that I think are useful enough to share.
-All scripts licensed under the GPL v3 unless otherwise stated.
+This repository is just a collection of scripts that I've come up with and/or found over time that I think are useful enough to share. All scripts licensed under the GPL v3 unless otherwise stated.
 
+archtype
+>  List system CPU architecture, reported by GCC
 
-archtype		  List system CPU architecture, reported by GCC
+backup-root-rsync
+> Backup root partition to another PC via rsync
 
-backup-root-rsync	  Backup root partition to another PC via rsync
+ckinfo
+> Lists system's CPU info as needed by the repo-ck repository for Arch Linux
 
-ckinfo                    Lists system's CPU info as needed by the
-			  repo-ck repository for Arch Linux
+convert2ico
+>  Converts an image to .ico format
 
-convert2ico		  Converts an image to .ico format
+cp2chroot
+> Copy bins and dependent libs to chroot (mod of l2chroot by nixCraft)
 
-cp2chroot                 Copy bins and dependent libs to chroot
-                          (mod of l2chroot by nixCraft)
+cur-linux-ver
+> Prints current linux kernel version
 
-cur-linux-ver		  Prints current linux kernel version
+diskspeed
+> Finds disks and displays their speed with hdparm
 
-diskspeed                 Finds disks and displays their speed with hdparm
+dump-disk-info
+> Dump Disk Info
 
-dump-disk-info		  Dump Disk Info
+get-systemd-services
+> List systemd services (name only, skip systemd*)
 
-get-systemd-services      List systemd services (name only, skip systemd*)
+git-auto-add-commit-push
+> Add files to, commit, and push to a git repo
 
-git-auto-add-commit-push  Add files to, commit, and push to a git repo
+gmi
+> Get Machine Info - Prints a line with HW/OS info
 
-gmi                       Get Machine Info - Prints a line with HW/OS info
+greatpkg
+> List space pkgs are taking up (<http://bbs.archlinux.org/viewtopic.php?pid=1493345#p1493345>)
 
-greatpkg                  List space pkgs are taking up
-                          bbs.archlinux.org/viewtopic.php?pid=1493345#p1493345
+gua
+> Guided User Add
 
-gua			  Guided User Add
+iptmod
+> Changes firewall rules
 
-iptmod			  Changes firewall rules
+monitor_off
+> Turn off monitor (Vinicius, license unknown)
 
-monitor_off               Turn off monitor (Vinicius, license unknown)
+myip4
+> Gets IP addresses (local and public)
 
-myip4			  Gets IP addresses (local and public)
+mysql-backup
+> Backup a MySQL database with individual files for each table
 
-mysql-backup              Backup a MySQL database with individual files
-			  for each table
+netinfo
+> Displays network information (udev/networkd/et al).
 
-netinfo                   Displays network information (udev/networkd/et al).
+pms-list-all-minus-base
+> Pacman Shortcut: List all installed packages except those in base and base-devel
 
-pms-list-all-minus-base	  Pacman Shortcut: List all installed packages
-			  except those in base and base-devel
+pms-remove-orphans
+> Pacman Shortcut: Remove orphaned packages
 
-pms-remove-orphans	  Pacman Shortcut: Remove orphaned packages
+qvms
+> Python script for managing QEMU VMs
 
-qvms                      Python script for managing QEMU VMs
+remote-reboot
+> Shortcut to reboot a remote machine via SSH while giving time to properly exit SSH
 
-remote-reboot             Shortcut to reboot a remote machine via SSH
-                          while giving time to properly exit SSH 
+remote-shutdown
+> Shortcut to shut down a remote machine via SSH while giving time to properly exit SSH
 
-remote-shutdown           Shortcut to shut down a remote machine via
-                          SSH while giving time to properly exit SSH 
+sendEmail
+> Send email from CLI (Brandon Zehm, GPL v2)
 
-sendEmail		  Send email from CLI (Brandon Zehm, GPL v2)
+ssh-authlock-toggle
+> Toggle .ssh directory/file security
 
-ssh-authlock-toggle       Toggle .ssh directory/file security
+sshd-passwds-toggle
+> Toggle the acceptance of SSH passwords
 
-sshd-passwds-toggle	  Toggle the acceptance of SSH passwords
+startvbvm
+> Attach storage to a VB VM, run, then detach
 
-startvbvm		  Attach storage to a VB VM, run, then detach
+update-nano-syntax-highlight
+> Update /etc/nanorc after new release of nano-syntax-highlighting-git on AUR
 
-update-nano-syntax-highlight   Update /etc/nanorc after new release of
-                               nano-syntax-highlighting-git on AUR
+update-reflector
+> Wrapper for using reflector to update pacman's repo list (Arch Linux)
 
-update-reflector          Wrapper for using reflector to update pacman's
-                          repo list (Arch Linux)
+update-system
+> Wrapper for updating a system in Arch Linux. Runs pacman, pacaur, removes orphans, checks /usr/bin/init (for kexec under VMs)
 
-update-system             Wrapper for updating a system in Arch Linux
-                          Runs pacman, pacaur, removes orphans, checks
-                          /usr/bin/init (for kexec under VMs) 
