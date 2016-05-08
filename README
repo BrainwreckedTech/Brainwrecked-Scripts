@@ -27,6 +27,9 @@ diskspeed
 dump-disk-info
 > Dump Disk Info
 
+gap
+> Get AUR Package.  Shortcut for downloading and extracting AUR packages for manual builds.
+
 get-systemd-services
 > List systemd services (name only, skip systemd*)
 
