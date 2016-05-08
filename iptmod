@@ -28,7 +28,7 @@ for ADDR in $2;  do
     [[ $SRVC == nfs   || $SRVC == all ]] && openports "111,1110,2049,3095,4045"
     [[ $SRVC == dlna  || $SRVC == all ]] && openports "8200"
     [[ $SRVC == btwsq || $SRVC == all ]] && openports "8888"
-    [[ $SRVC == sshd  || $SRVC == all ]] && openports "28282"
+    [[ $SRVC == sshd  || $SRVC == all ]] && openports "$(grep '^Port' /etc/ssh/sshd_config | sed 's/\s+/ /g' | cut -d\  -f2)"
   done
 done
 
