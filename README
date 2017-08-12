@@ -27,11 +27,11 @@ diskspeed
 dump-disk-info
 > Dump Disk Info
 
+fakefiletime
+> Fake a file's time relative to other files.
+
 erc
 > Edit Root Crontab.  Shortcut for editing root's crontab with nano.
-
-gap
-> Get AUR Package.  Shortcut for downloading and extracting AUR packages for manual builds.
 
 get-systemd-services
 > List systemd services (name only, skip systemd*)
@@ -99,3 +99,5 @@ update-reflector
 update-system
 > Wrapper for updating a system in Arch Linux. Runs pacman, pacaur, removes orphans, checks /usr/bin/init (for kexec under VMs)
 
+xcbmanip
+> Manipulates the X Clipboard.
