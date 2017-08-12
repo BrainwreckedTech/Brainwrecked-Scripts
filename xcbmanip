@@ -1,0 +1,53 @@
+#!/bin/bash
+# X Clipboard Manipulation
+
+# Grab the clipboard contents
+XCBC="$(xclip -o -selection c)"
+# For comparisons, compare in lowercase
+LCCB="${XCBC,,}"
+
+ACTN="Google Short URL to Google Sheets HYPERLINK\n"
+
+if [ "${XCBC:0:15}" == "https://goo.gl/" ]; then
+  # Discard everything before the final slash
+  CODE="${XCBC##*/}"
+  # Put what we want into the clipboard
+  echo -n "=HYPERLINK(\"${XCBC}\",\"${CODE}\")" | xclip -i -selection c
+  XMSG="✔ ${ACTN}"
+else
+  XMSG="✕ ${ACTN}"
+fi
+
+ACTN="Space Nico Nico Douga Tags\n"
+
+if [ "${LCCB:0:19}" == "vocaloidprojectdiva" ]; then
+  # Put spaces where they belong
+  for SPACEME in VOCALOID Vocaloid ProjectDIVA ProjectDiva 初音ミク 巡音ルカ 鏡音レン 鏡音リン Meiko MEIKO Kaito KAITO; do
+    XCBC="${XCBC/${SPACEME}/${SPACEME} }"
+  done
+  # Fix EN-vs-JA capitalization
+  XCBC="${XCBC/Vocaloid/VOCALOID}"
+  XCBC="${XCBC/ProjectDiva/ProjectDIVA}"
+  XCBC="${XCBC/Meiko/MEIKO}"
+  XCBC="${XCBC/Kaito/KAITO}"
+  # Put what we want into the clipboard
+  echo -n "${XCBC}" | xclip -i -selection c
+  XMSG+="✔ ${ACTN}"
+else
+  XMSG+="✕ ${ACTN}"
+fi
+
+ACTN="Fix Google Sheets Copy-Paste\n"
+
+if [ "${XCBC:0:1}" == '"' ]; then
+  if [ "${XCBC: -1}" == '"' ]; then
+    echo -n "$(xclip -o -seclection c)" | sed 's|^"||g;s|"\t*||g' | xclip -i -selection c
+    XMSG+="✔ ${ACTN}"
+  else
+    XMSG+="✕ ${ACTN}"
+  fi
+else
+  XMSG+="✕ ${ACTN}"
+fi
+
+Xdialog --title "X Clipboard Manipulation" --msgbox "${XMSG}" 0 0
