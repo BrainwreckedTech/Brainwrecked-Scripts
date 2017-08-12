@@ -1,0 +1,67 @@
+#!/bin/bash
+
+ERROR=false
+[[ -z ${DEBUG+X} ]] && DEBUG=false
+unset -v FRFILE FRDATE TOFILE TODATE BTFILE BTDATE ADJUST
+
+read -r -d '' HLPMSG <<'HEREDOC'
+fakefiletime --from [file] --to [file] --adjust [time-adjustment]'
+fakefiletime --from [file] --to [file] --between [file]'
+HEREDOC
+
+while test $# -gt 0; do
+
+  case "${1}" in
+    --from)    shift; FRFILE="${1}"; shift  ;;
+    --to)      shift; TOFILE="${1}"; shift  ;;
+    --between) shift; BTFILE="${1}"; shift  ;;
+    --adjust)  shift; ADJUST="${1}"; shift  ;;
+    --help)    echo "${HLPMSG}";     exit 0 ;;
+    *) echo -e "Argument '${1}' is unknown.\n${HLPMSG}"; exit 1 ;;
+  esac
+
+done
+
+if ${DEBUG}; then
+  echo "FRFILE=${FRFILE}"
+  echo "TOFILE=${TOFILE}"
+  echo "BTFILE=${BTFILE}"
+  echo "ADJUST=${ADJUST}"
+fi
+
+[[ -z ${FRFILE} ]] && ERROR=true && echo 'No file to copy time from.'
+[[ -z ${TOFILE} ]] && ERROR=true && echo 'No file to copy time to.'
+[[ -z ${BTFILE} ]] && [[ -z ${ADJUST} ]] && ERROR=true && \
+  echo 'Neither --adjust or --between was specified.'
+
+[[ ! -f "${FRFILE}" ]] && ERROR=true && echo 'The --from file does not exist.'
+[[ ! -f "${TOFILE}" ]] && ERROR=true && echo 'The --to file does not exist.'
+[[ ! -f "${BTFILE}" ]] && [[ -z ${ADJUST} ]] && ERROR=true && \
+  echo 'The --between file does not exist.'
+
+${ERROR} && "${0}" --help && exit 1
+
+[ "${ADJUST}" == none ] && ADJUST="+0 seconds"
+
+FRDATE="$(stat -c %Y "${FRFILE}")"
+TODATE="$(stat -c %Y "${TOFILE}")"
+
+if [[ -z ${BTFILE} ]]; then
+  NWDATE="$(date -d "$(date -r "${FRFILE}") ${ADJUST}" +%s)"
+else
+  BTDATE="$(stat -c %Y "${BTFILE}")"
+  NWDATE="$(awk "BEGIN {a=${BTDATE};b=${FRDATE};c=b-a;d=int(c/2);print d+a }")"
+fi
+
+if ${DEBUG}; then
+  echo "FRDATE=${FRDATE}="$(date -R -d @"${FRDATE}" 2> /dev/null)""
+  echo "TODATE=${TODATE}="$(date -R -d @"${TODATE}" 2> /dev/null)""
+  [[ ! -z ${BTFILE} ]] && echo "BTDATE=${BTDATE}="$(date -R -d @"${BTDATE}" 2> /dev/null)""
+  echo "NWDATE=${NWDATE}="$(date -R -d @"${NWDATE}" 2> /dev/null)""
+fi
+
+echo "Changing date of '${TOFILE}' from '$(date -d @${TODATE})' to '$(date -d @${NWDATE})'"
+
+touch -d "$(date -R -d @"${NWDATE}")" "${TOFILE}"
+
+exit 0
