@@ -2,7 +2,8 @@
 # This script automates system updates in Arch Linux
 
 # Call the update-reflector script to get the best mirrors
-/usr/bin/sudo /scr/update-reflector "United States"
+MY_COO="$(/usr/bin/curl http://geoip.nekudo.com/api | /usr/bin/jq -r .country.name)
+/usr/bin/sudo /usr/bin/reflector -p https -l 5 -c "${MY_COO}" --sort rate --save /etc/pacman.d/mirrorlist
 
 # Build command to execute
 cmd="/usr/bin/sudo /usr/bin/pacman -Syu --noconfirm"
@@ -25,7 +26,7 @@ else
           mkdir /pacaur/${USER}
         fi
       fi
-    AURDEST=/pacaur/${USER} pacaur -u --devel --noedit --needed --ignore-ood --noconfirm
+    AURDEST=/pacaur/${USER} /usr/bin/pacaur -u --devel --noedit --needed --ignore-ood --noconfirm
     fi
   fi
 fi
