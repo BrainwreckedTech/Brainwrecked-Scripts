@@ -6,19 +6,16 @@ XCBC="$(xclip -o -selection c)"
 # For comparisons, compare in lowercase
 LCCB="${XCBC,,}"
 
-ACTN="Google Short URL to Google Sheets HYPERLINK\n"
+XMSG="none"
+
 
 if [ "${XCBC:0:15}" == "https://goo.gl/" ]; then
   # Discard everything before the final slash
   CODE="${XCBC##*/}"
   # Put what we want into the clipboard
   echo -n "=HYPERLINK(\"${XCBC}\",\"${CODE}\")" | xclip -i -selection c
-  XMSG="✔ ${ACTN}"
-else
-  XMSG="✕ ${ACTN}"
+  XMSG="Converted Google Short URL to Google Sheets HYPERLINK"
 fi
-
-ACTN="Space Nico Nico Douga Tags\n"
 
 if [ "${LCCB:0:19}" == "vocaloidprojectdiva" ]; then
   # Put spaces where they belong
@@ -32,22 +29,60 @@ if [ "${LCCB:0:19}" == "vocaloidprojectdiva" ]; then
   XCBC="${XCBC/Kaito/KAITO}"
   # Put what we want into the clipboard
   echo -n "${XCBC}" | xclip -i -selection c
-  XMSG+="✔ ${ACTN}"
-else
-  XMSG+="✕ ${ACTN}"
+  XMSG="Spaced Nico Nico Douga Tags"
 fi
 
-ACTN="Fix Google Sheets Copy-Paste\n"
-
-if [ "${XCBC:0:1}" == '"' ]; then
-  if [ "${XCBC: -1}" == '"' ]; then
-    echo -n "$(xclip -o -seclection c)" | sed 's|^"||g;s|"\t*||g' | xclip -i -selection c
-    XMSG+="✔ ${ACTN}"
-  else
-    XMSG+="✕ ${ACTN}"
-  fi
-else
-  XMSG+="✕ ${ACTN}"
+if [ "${XCBC: -1:1}" == '	' ]; then
+  echo -n "$(xclip -o -seclection c)" | sed 's|^"||g;s|"\t*||g;s|\t*$||g;' | sed ':a;N;$!ba;s/ <br>$//g' | xclip -i -selection c
+  XMSG="Fixed Google Sheets Copy-Paste"
 fi
+
+if [[ "${XCBC}" =~ ^https://youtu\.be/.{11}$ ]]; then
+  echo -n "$(xclip -o -selection c)" | sed 's|^https://youtu\.be/||g' | xclip -i -selection c
+  XMSG="Extracted YouTube Video ID From Hyperlink."
+elif [[ "${XCBC}" =~ ^https://www\.youtube\.com/watch\?.*$ ]]; then
+  echo -n "$(xclip -o -selection c)" | sed 's|.*v=\(.\{11\}\).*|\1|g' | xclip -i -selection c
+  XMSG="Extracted YouTube Video ID From Hyperlink."
+elif [[ "${XCBC}" =~ ^https://www\.youtube\.com/edit\?.*$ ]]; then
+  echo -n "$(xclip -o -selection c)" | sed 's|.*video_id=\(.\{11\}\).*|\1|g' | xclip -i -selection c
+  XMSG="Extracted YouTube Video ID From Hyperlink."
+fi
+
+if [[ "${XCBC}" =~ ^http://nico\.ms/[ns1][m0-9][0-9]{6,8}$ ]]; then
+  echo -n "$(xclip -o -selection c)" | sed 's|^https://nico\.ms/||g' | xclip -i -selection c
+  XMSG="Extracted Nico Video ID From Hyperlink"
+elif [[ "${XCBC}" =~ ^http://www\.nicovideo\.jp/watch/[ns1][m0-9][0-9]{6,8} ]]; then
+  echo -n "$(xclip -o -selection c)" | sed 's|.*/watch/\([ns1][m0-9][0-9]\{6,8\}\).*|\1|g' | xclip -i -selection c
+  XMSG="Extracted Nico Video ID From Hyperlink"
+fi
+
+if [[ ${XCBC} =~ ^.*Project\ Diva\ .*\ -\ .*\ -\ .*$ ]]; then
+  echo -n "$(xclip -o -selection c)" | sed 's| - | — |g;s| \(.*\) — \([0-9]\{2,3\}\.[0-9]\{2\}\%\) Perfect| \1 Perfect (\2)|g' | xclip -i -selection c
+  XMSG="Fixed Old Project Diva YouTube Title"
+fi
+
+if [[ ${XCBC} =~ ^.*Project\ Diva\ .*\ —\ .*\ —\ .*$ ]]; then
+  echo -n "$(xclip -o -selection c)" | sed 's/Project Diva \([[:alnum:]]\+ \{0,1\}[[:alnum:]]*\) — /【Project Diva \1】/g;s/】\(.*\) — /】「\1」/g' | xclip -i -selection c
+  XMSG="Converted YouTube Title From EN to JA."
+fi
+
+if [[ ${XCBC} =~ ^\#.*-.* ]]; then
+  echo -n "$(xclip -o -selection c)" | sed 's/-/_/g' | xclip -i -selection c
+  XMSG="Converted dashed hastags to underscored hashtags"
+fi
+
+PDGL=(初音ミク-ProjectDIVA- 初音ミク-ProjectDIVA-2nd 初音ミク-ProjectDIVA-extend 初音ミク-ProjectDIVA-F 初音ミク-ProjectDIVA-F2nd 初音ミク-ProjectDIVA-X 'ProjectDivaArcade Future_Tone' 初音ミク-ProjectDIVA-)
+
+set -x
+if [ "${XMSG}" = "none" ]; then
+  for (( lcv=0; lcv<$(( ${#PDGL[@]} - 1 )); lcv++ )) {
+    if [[ ${XCBC} =~ ${PDGL[${lcv}]}$ ]]; then
+      echo -n "$(xclip -o -selection c)" | sed "s/${PDGL[${lcv}]}/${PDGL[$(( ${lcv} + 1 ))]}/g" | xclip -i -selection c
+      XMSG="Converted ${PDGL[${lcv}]} to ${PDGL[ $(( ${lcv} + 1 ))]}"
+      break
+    fi
+  }
+fi
+set +x
 
 Xdialog --title "X Clipboard Manipulation" --msgbox "${XMSG}" 0 0
