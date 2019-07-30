@@ -3,17 +3,19 @@
 ##############################################################
 # Copyright (C) 2009 Vinicius (Arch Linux Forums)            #
 # https://bbs.archlinux.org/viewtopic.php?pid=506374#p506374 #
+# Copyright (C) 2018 BrainwreckedTech                        #
+# Fixed greps, added verbiage, added test capability         #
 ##############################################################
-# Check if X is running or not, turn off monitor, #
-# wait for a key press and turn it on again.      #
-###################################################
+# Check if X is running or not, turn off monitor,            #
+# wait for a key press and turn it on again.                 #
+##############################################################
 
 grep_result_file=$PWD'/x_running'
 
 # Check if X is running.
 ps -e | grep -e "\bX\b" > $grep_result_file
-ps -e | grep -e "\bxorg\b" >> $grep_result_file
-ps -e | grep -e "\bxserver\b" >> $grep_result_file
+ps -e | grep -e "\bXorg\b" >> $grep_result_file
+ps -e | grep -e "\bXserver\b" >> $grep_result_file
 
 ## If you want to check result file, uncomment following lines.
 #echo "===== $grep_result_file - begin ====="
@@ -27,21 +29,34 @@ if [ ! -s $grep_result_file ] || [[ $(tty) =~ tty ]] || [[ $(tty) =~ vc ]]; then
         echo 'Rerun as super user or start X and run from a terminal.'
         exit 0
     fi
-    turn_off='vbetool dpms off'
-    turn_on='vbetool dpms on'
+    if [ "${1}" == "test" ]; then
+      echo "Will use vbetool to turn monitor(s) on and off"
+    else
+      turn_off='vbetool dpms off'
+      turn_on='vbetool dpms on'
+    fi
 else
-    echo 'Detected X running...'
-    turn_off='xset dpms force off'
+    echo 'Detected X running.'
+    echo 'Monitor(s) will turn on with the next keyboard or mouse event.'
+    if [ "${1}" == "test" ]; then
+      echo "Will use xset to turn monitor(s) on and off"
+    else
+      turn_off='xset dpms force off'
+  fi
 fi
 
-echo 'Turning off monitor...'
-$turn_off
+if [ "${1}" != "test" ]; then
+  echo 'Turning off monitor...'
+  $turn_off
 
-echo 'Waiting for a key press...'
-read -n1 -s
+  if [ -n "${turn_on}" ]; then
+    echo 'Waiting for a key press...'
+    read -n1 -s
 
-echo 'Turning on monitor...'
-$turn_on
+    echo 'Turning on monitor...'
+    $turn_on
+  fi
+fi
 
 rm $grep_result_file
 
