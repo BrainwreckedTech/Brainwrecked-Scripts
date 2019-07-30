@@ -26,7 +26,7 @@ else
           mkdir /pacaur/${USER}
         fi
       fi
-    AURDEST=/pacaur/${USER} /usr/bin/pacaur -u --devel --noedit --needed --ignore-ood --noconfirm
+    AURDEST=/pacaur/${USER} /usr/bin/pacaur -u --devel --noedit --needed --noconfirm
     fi
   fi
 fi
