@@ -1,9 +1,17 @@
 #!/bin/bash
 # This script automates system updates in Arch Linux
 
+# Determine country of origin
+echo "$(tput setaf 12)::$(tput sgr0) Determine country of origin..."
+GIPURL="http://api.petabyet.com/geoip"
+GETVAL=".country_code"
+MY_COO="$(/usr/bin/curl -s ${GIPURL} | /usr/bin/jq -r ${GETVAL})"
+echo "$(tput setaf 10)==>$(tput sgr0) ${MY_COO}"
+
 # Call the update-reflector script to get the best mirrors
-MY_COO="$(/usr/bin/curl -s http://geoip.nekudo.com/api | /usr/bin/jq -r .country.name)"
+echo "$(tput setaf 12)::$(tput sgr0) Determine best mirrors..."
 /usr/bin/sudo /usr/bin/reflector -p https -l 5 -c "${MY_COO}" --sort rate --save /etc/pacman.d/mirrorlist
+tail -5 /etc/pacman.d/mirrorlist | sed "s/^Server = \(.*\)/$(tput setaf 10)==>$(tput sgr0) \1/g"
 
 # Build command to execute
 cmd="/usr/bin/sudo /usr/bin/pacman -Syu --noconfirm"
