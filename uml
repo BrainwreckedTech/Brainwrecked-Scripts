@@ -1,0 +1,14 @@
+#!/usr/bin/env sh
+
+GIPURL="http://api.petabyet.com/geoip"
+GETVAL=".country_code"
+
+if [ -z "${1}" ]; then
+  MY_COO="$(/usr/bin/curl -s ${GIPURL} | /usr/bin/jq -r ${GETVAL})"
+else
+  MY_COO="${1}"
+fi
+
+printf "\033[1;34m::\033[97m Determining Best Mirrors...\033[0m\n"
+/usr/bin/sudo /usr/bin/reflector -p https -l 5 -c "${MY_COO}" --sort rate --save /etc/pacman.d/mirrorlist
+cat /etc/pacman.d/mirrorlist | grep ^Server
