@@ -1,9 +1,31 @@
-#!/bin/bash
-cat /etc/ssh/sshd_config | grep 'PasswordAuthentication yes' > /dev/null
-[[ $? -eq 0 ]] && { from=yes; to=no; } || { from=no; to=yes; }
+#!/usr/bin/env sh
+
+[ ! "$(id -u)" -eq 0 ] && echo "Run as superuser." && exit 1
+
+case "${1}" in
+  "on"|"enable"|"unlock")
+    FROM=yes; TO=no;
+    ;;
+  "off"|"disable"|"lock")
+    FROM=no; TO=yes;
+    ;;
+  "toggle")
+    if grep -q '^PasswordAuthentication yes' /etc/ssh/sshd_config; then
+      FROM=yes; TO=no;
+    else
+      FROM=no; TO=yes;
+    fi
+  ;;
+esac
 
 for OPTION in PasswordAuthentication ChallengeResponseAuthentication; do
-  echo ${OPTION} $from =\> $to
-  sudo sed -i "s/${OPTION} ${from}/${OPTION} ${to}/g" /etc/ssh/sshd_config
+  sed -i "s/#* *${OPTION} *${FROM}/${OPTION} ${TO}/g; w /dev/stdout" /etc/ssh/sshd_config
 done
-sudo systemctl restart sshd
+
+if command -v systemctl > /dev/null; then
+  systemctl restart sshd
+elif [ -x /etc/init.d/sshd ]; then
+  /etc/init.d/sshd restart
+else
+  echo "Restart SSH server to have changes take effect."
+fi
