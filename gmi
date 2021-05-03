@@ -23,7 +23,7 @@ GHZ="${PMH:0:1}.${PMH:1:2}"
 PCC=$(cat /proc/cpuinfo | sort -u | grep -c '^core id')
 PCC=${PCC/0/1} # For ARM devices which don't report core ids
 LCC=$(cat /proc/cpuinfo | grep -c '^processor')
-DST="$(uname -m | sed 's/i[34567]86/x86_32/g') $(cat /etc/os-release | grep PRETTY_NAME | cut -d\" -f2)"
+DST="$(uname -m | sed 's/^x86_64$/x64v1/g;s/x86_64-v/x64/g') $(cat /etc/os-release | grep PRETTY_NAME | cut -d\" -f2)"
 PVN="$(lscpu | grep '^Vendor ID:' | sed 's/\s//g' | cut -d: -f2 | sed 's/\(Genuine\|Authentic\)//g')"
 PMN="$(lscpu | grep '^Model name' | sed 's/:\s\s*/:/g' | cut -d: -f2 | sed 's/\s/ /g')"
 PMN="${PMN/AMD /}"		# Remove AMD (already specified in vendor string)
@@ -68,10 +68,10 @@ ckflags vme && PAT=i486 && \
 ckflags cx8 fpu mmx && PAT=i586 && \
 ckflags cmov fxsr sse && PAT=i686 && \
 ckflags sse2 && PAT=i786 && \
-ckflags lm syscall && PAT=x86_64-v1 && \
-ckflags cx16 lahf_lm popcnt sse4_1 sse4_2 ssse3 && PAT=x86_64-v2 && \
-ckflags avx avx2 bmi1 bmi2 f16c fma abm movbe xsave && PAT=x86_64-v3 && \
-ckflags avx512f avx512bw avx512cd avx512dq avx512vl && PAT=x86_64-v4
+ckflags lm syscall && PAT=x64v1 && \
+ckflags cx16 lahf_lm popcnt sse4_1 sse4_2 ssse3 && PAT=x64v2 && \
+ckflags avx avx2 bmi1 bmi2 f16c fma abm movbe xsave && PAT=x64v3 && \
+ckflags avx512f avx512bw avx512cd avx512dq avx512vl && PAT=x64v4
 set +e
 
 if type Xorg &> /dev/null; then
@@ -91,4 +91,4 @@ else
   DTE="CLI"
 fi
 
-echo "${PAT} ${PVN} ${PMN} ${GHZ}GHz ${PCC}c${LCC}t ${CPU} with ${RAM}GB RAM running ${DST} ${DTE}"
+echo "${PAT} ${PVN} ${PMN} ${GHZ}GHz ${PCC}c/${LCC}t ${CPU} with ${RAM}GB RAM running ${DST} ${DTE}"
