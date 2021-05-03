@@ -1,8 +1,12 @@
-#!/bin/bash
+#!/usr/bin/env sh
 
-blargityblargblarg &> /dev/null
-while [ ${?} != 0 ]; do
+function need_sudo() {
+while true; do
   sudo echo 'test' > /dev/null
+  [ "${?}" -eq "0" ] && SUDO=sudo && break
 done
+}
 
-diff -u /etc/nanorc <(echo -e "$(cat /etc/nanorc | grep -v '^include')\n\n$(cat /usr/share/nano-syntax-highlighting/nanorc.sample)") | tee /dev/tty | sudo patch --verbose /etc/nanorc
+[ -e "${HOME}/.nanorc" ] && { TARGET="${HOME}/.nanorc"; } || { TARGET="/etc/nanorc"; need_sudo; }
+echo "Patching ${TARGET}"
+diff -u "${TARGET}" <(echo -e "$(grep -v '^include' "${TARGET}")\n\n$(cat /usr/share/nano-syntax-highlighting/nanorc.sample)") | tee /dev/tty | ${SUDO} patch --verbose "${TARGET}"
