@@ -1,14 +1,47 @@
 #!/usr/bin/env sh
 
-GIPURL="http://api.petabyet.com/geoip"
-GETVAL=".country_code"
+CAT_BIN=$(command -v cat)
+CURL_BIN=$(command -v curl)
+GREP_BIN=$(command -v grep)
+JSONQUERY=$(command -v jq)
+PACMANBIN=$(command -v pacman)
+REFLECTOR=$(command -v reflector)
+SED_BIN=$(command -v sed)
+SUDO_BIN=$(command -v sudo)
 
-if [ -z "${1}" ]; then
-  MY_COO="$(/usr/bin/curl -s ${GIPURL} | /usr/bin/jq -r ${GETVAL})"
+[ -z "${CAT_BIN}" ] && echo "Could not find cat" && exit 1
+[ -z "${CURL_BIN}" ] && echo "Could not find curl" && exit 2
+[ -z "${GREP_BIN}" ] && echo "Could not find grep" && exit 3
+[ -z "${JSONQUERY}" ] && echo "Could not find jq" && exit 4
+[ -z "${PACMANBIN}" ] && echo "Could not find pacman" && exit 5
+[ -z "${REFLECTOR}" ] && echo "Could not find reflector" && exit 6
+[ -z "${SED_BIN}" ] && echo "Could not find sed" && exit 7
+
+GEOIPURL="http://api.petabyet.com/geoip"
+JQGETVAL=".country"
+
+if [ -n "${SUDO_BIN}" ]; then
+  false
+  while [ ${?} != 0 ]; do
+    ${SUDO_BIN} echo 'test' > /dev/null
+  done
+  P_COMMAND="${SUDO_BIN} ${PACMANBIN}"
+  R_COMMAND="${SUDO_BIN} ${REFLECTOR}"
 else
-  MY_COO="${1}"
+  P_COMMAND="${PACMANBIN}"
+  R_COMMAND="${REFLECTOR}"
 fi
 
+if [ -n "${1}" ]; then
+  printf "\033[1;34m::\033[97m User-determined county...\033[0m\n"
+  COUNTRY="${1}"
+else
+  printf "\033[1;34m::\033[97m Geolocating county...\033[0m\n"
+  COUNTRY="$(${CURL_BIN} -s ${GIPURL} | ${JSONQUERY} -r ${JQGETVAL})"
+fi
+
+printf " %-20s\n" "${COUNTRY}"
 printf "\033[1;34m::\033[97m Determining Best Mirrors...\033[0m\n"
-/usr/bin/sudo /usr/bin/reflector -p https -l 5 -c "${MY_COO}" --sort rate --save /etc/pacman.d/mirrorlist
-cat /etc/pacman.d/mirrorlist | grep ^Server
+${R_COMMAND} -p https -l 5 -c "${COUNTRY}" --sort rate --save /etc/pacman.d/mirrorlist
+${CAT_BIN} /etc/pacman.d/mirrorlist | ${GREP_BIN} ^Server | ${SED_BIN} 's/\(.*\)/ \1/g'
+${P_COMMAND} -Sy
