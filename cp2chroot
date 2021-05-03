@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env sh
 # Use this script to copy shared (libs) files to a chroot/jail.
 # ----------------------------------------------------------------------------
 # Written by Paul A. Hinchberger III <http://www.bw-tech.net>
@@ -13,26 +13,24 @@
 # + Added error checking support
 # -------------------------------------------------------------------------------
 
-if [ $# -eq 0 ]; then
-  echo "Syntax : $0 /path/to/jail /path/to/executable "
+print_help () {
+  echo " Syntax: $0 /path/to/jail /path/to/executable"
   echo "Example: $0 /srv/jail/backup /usr/bin/rsync"
-  exit 1
-fi
+}
 
-[ ! -f $2 ] && echo $2 does not exist && exit 1
-[ ! -d $1 ] && echo $1 does not exist && exit 1 
+[ ! -d "${1}" ] && echo "${1} does not exist" && print_help && exit 1
+[ ! -f "${2}" ] && echo "${2} does not exist" && print_help && exit 2
 
-cp -v $2 $1$2
+cp -v "${2}" "${1}${2}"
 
-list="$(ldd $2 | awk '{ print $3 }' |egrep -v ^'\(')"
+while read -r FILE; do
+  FDIR="$(dirname "${FILE}")"
+  [ ! -d "${1}${FDIR}" ] && mkdir -p "${1}${FDIR}"
+  cp -v "${FILE}" "${1}${FDIR}"
+done < "$(ldd "${2}" | awk '{ print $3 }' | egrep -v ^'\(')"
 
-for file in ${list}; do
-  fdir="$(dirname ${file})"
-  [ ! -d ${1}${fdir} ] && mkdir -p ${1}${fdir}
-  cp -v ${file} ${1}${fdir}
-done
 
-sldl="$(ldd $2 | grep 'ld-linux' | awk '{ print $1}')"
-sdir="$(dirname ${sldl})"
+SLDL="$(ldd "${2}" | grep 'ld-linux' | awk '{ print $1}')"
+SDIR="$(dirname "${SLDL}")"
 
-[ ! -f ${1}${sldl} ] && cp -v ${sldl} ${1}${sdir}
+[ ! -f "${1}${SLDL}" ] && cp -v "${SLDL}" "${1}${SDIR}"
