@@ -1,21 +1,36 @@
-#!/bin/bash
+#!/usr/bin/env sh
 
 ssh_lock() {
-  echo -e "\e[34m:: \e[97m $HOME/.ssh insecure...locking\e[0m"
-  sudo chmod -v 400 $HOME/.ssh/*
-  sudo chattr -V +i $HOME/.ssh/authorized_keys
-  sudo chattr -V +i $HOME/.ssh
+  sudo chmod -v 400 "${HOME}"/.ssh/*
+  sudo chattr -V +i "${HOME}"/.ssh/authorized_keys
+  sudo chattr -V +i "${HOME}"/.ssh
 }
 
 ssh_unlock() {
-  echo -e "\e[34m:: \e[97m $HOME/.ssh secured...unlocking\e[0m"
-  sudo chattr -V -i $HOME/.ssh
-  sudo chattr -V -i $HOME/.ssh/authorized_keys
-  sudo chmod -v 600 $HOME/.ssh/*
+  sudo chattr -V -i "${HOME}"/.ssh
+  sudo chattr -V -i "${HOME}"/.ssh/authorized_keys
+  sudo chmod -v 600 "${HOME}"/.ssh/*
 }
 
-da=$(lsattr -d $HOME/.ssh | cut -d\  -f1 | grep -q 'i')$?
-fa=$(lsattr $HOME/.ssh/authorized_keys | cut -d\  -f1 | grep -q 'i')$?
-fp=$(ls -lA $HOME/.ssh | grep -v total | cut -d\  -f1 | grep -q 'w')$?
-
-[ $da = 0 -a $fa = 0 -a $fp != 0 ] && ssh_unlock || ssh_lock
+case "${1}" in
+  "lock")
+    printf "\033[34m:: \033[97m Locking %s/.ssh\033[0m" "${HOME}"
+    ssh_lock
+    ;;
+  "unlock")
+    printf "\033[34m:: \033[97m Unlocking %s/.ssh\033[0m" "${HOME}"
+    ssh_unlock
+    ;;
+  "toggle")
+    DA=$(lsattr -d "${HOME}/.ssh" | cut -d\  -f1 | grep -q 'i')$?
+    FA=$(lsattr "${HOME}/.ssh/authorized_keys" | cut -d\  -f1 | grep -q 'i')$?
+    FP=$(stat -c "%A" "${HOME}/.ssh/authorized_keys" | grep -q 'w')$?
+    if [ "${DA}" -eq 0 ] && [ "${FA}" -eq 0 ] && [ "${FP}" -ne 0 ]; then
+      printf "\033[34m:: \033[97m %s/.ssh secured...unlocking\033[0m" "${HOME}"
+      ssh_unlock
+    else
+      printf "\033[34m:: \033[97m %s/.ssh insecure...locking\033[0m" "${HOME}"
+      ssh_lock
+    fi
+    ;;
+esac
