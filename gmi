@@ -33,10 +33,9 @@ PCC=$(cat /proc/cpuinfo | sort -u | grep -c '^core id')
 PCC=${PCC/0/1} # For ARM devices which don't report core ids
 LCC=$(cat /proc/cpuinfo | grep -c '^processor')
 DST="$(uname -m | sed 's/^x86_64$/x64v1/g;s/x86_64-v/x64/g') $(cat /etc/os-release | grep PRETTY_NAME | cut -d\" -f2)"
-PVN="$(lscpu | grep '^Vendor ID:' | sed 's/\s//g' | cut -d: -f2 | sed 's/\(Genuine\|Authentic\)//g')"
+PVN="$(lscpu | grep '^Vendor ID:' | sed 's/\s//g' | cut -d: -f2 | sed 's/\(Genuine\|Authentic\|ARM\)//g')"
 PMN="$(lscpu | grep '^Model name' | sed 's/:\s\s*/:/g' | cut -d: -f2 | sed 's/\s/ /g')"
 PMN="${PMN/AMD /}"		# Remove AMD (already specified in vendor string)
-PMD="${PMN/ARM /}"		# Remove ARM (implied in architecture string)
 PMN="${PMN/Intel /}"		# Remove Intel (already specified in vendor string)
 PMN="${PMN/ CPU/}"		# Redundant
 PMN="${PMN/ Processor/}"	# Redundant
@@ -105,4 +104,4 @@ else
   DTE="CLI"
 fi
 
-echo "${PAT} ${PVN} ${PMN} ${GHZ}GHz ${PCC}c/${LCC}t ${CPU} with ${RAM}GB RAM running ${DST} ${DTE}"
+echo "${PAT} ${PVN}${PVN/*/ }${PMN} ${GHZ}GHz ${PCC}c/${LCC}t ${CPU} with ${RAM}GB RAM running ${DST} ${DTE}"
