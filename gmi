@@ -104,4 +104,5 @@ else
   DTE="CLI"
 fi
 
-echo "${PAT} ${PVN}${PVN/*/ }${PMN} ${GHZ}GHz ${PCC}c/${LCC}t ${CPU} with ${RAM}GB RAM running ${DST} ${DTE}"
+echo "${PAT} ${PVN}${PVN//[A-Za-z]*/ }${PMN} ${GHZ}GHz ${PCC}c/${LCC}t ${CPU} with ${RAM}GB RAM running ${DST} ${DTE}"
+
