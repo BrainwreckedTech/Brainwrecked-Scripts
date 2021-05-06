@@ -1,2 +1,0 @@
-#!/bin/bash
-/bin/comm -23 <(/bin/pacman -Qqn|sort) <(/bin/pacman -Qqg base base-devel|sort)
