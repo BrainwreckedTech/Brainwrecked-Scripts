@@ -27,11 +27,11 @@ diskspeed
 dump-disk-info
 > Dump Disk Info
 
-fakefiletime
-> Fake a file's time relative to other files.
-
 erc
 > Edit Root Crontab.  Shortcut for editing root's crontab with nano.
+
+fakefiletime
+> Fake a file's time relative to other files.
 
 get-systemd-services
 > List systemd services (name only, skip systemd*)
@@ -48,8 +48,14 @@ greatpkg
 gua
 > Guided User Add
 
+hddfill
+> Wipe a device
+
 iptmod
 > Changes firewall rules
+
+mkminchroot
+> Create a minimal chroot environment
 
 monitor_off
 > Turn off monitor (Vinicius, license unknown)
@@ -63,11 +69,8 @@ mysql-backup
 netinfo
 > Displays network information (udev/networkd/et al).
 
-pms-list-all-minus-base
-> Pacman Shortcut: List all installed packages except those in base and base-devel
-
-pms-remove-orphans
-> Pacman Shortcut: Remove orphaned packages
+pacctl
+> Pacman helper
 
 qvms
 > Python script for managing QEMU VMs
@@ -92,12 +95,6 @@ startvbvm
 
 update-nano-syntax-highlight
 > Update /etc/nanorc after new release of nano-syntax-highlighting-git on AUR
-
-update-reflector
-> Wrapper for using reflector to update pacman's repo list (Arch Linux)
-
-update-system
-> Wrapper for updating a system in Arch Linux. Runs pacman, pacaur, removes orphans, checks /usr/bin/init (for kexec under VMs)
 
 xcbmanip
 > Manipulates the X Clipboard.
