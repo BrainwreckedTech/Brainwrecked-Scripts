@@ -21,12 +21,17 @@ SUDO_BIN=$(command -v sudo)
 [ -z "${SED_BIN}" ] && echo "Could not find sed" && exit 7
 
 GET_PRIVILEGE() {
-  while ! ${SUDO_BIN} echo 'test' > /dev/null; do
+  while ! ${SUDO_BIN} true; do
     continue
   done
 }
 
 case "${1}" in
+  download)
+    case "${2}" in
+      updates) GET_PRIVILEGE && ${SUDO_BIN} pacman -Syuw --noconfirm;;
+    esac
+    ;;
   list)
     THINK_ABOUT() {
       CATEGORY="${1}"
@@ -59,7 +64,6 @@ case "${1}" in
     esac
   ;;
   remove)
-    set -x
     INSTALLED="$(mktemp)"
     pacman -Qq | sort > "${INSTALLED}"
     COMPARETO="$(mktemp)"
@@ -68,7 +72,7 @@ case "${1}" in
       all-but-base) pms list expanded-base | tr ' ' '\n' | sort > "${COMPARETO}"; ${SUDO_BIN} pacman -R $(comm -23 "${INSTALLED}" "${COMPARETO}");;
       all-but-core) pms list core | tr ' ' '\n' | sort > "${COMPARETO}"; ${SUDO_BIN} pacman -R $(comm -23 "${INSTALLED}" "${COMPARETO}");;
       all-but-xorg) echo "$(pms list xorg | tr ' ' '\n')${NEWLINE}$(pms list core | tr ' ' '\n')" | sort -u > "${COMPARETO}"; ${SUDO_BIN} pacman -R $(comm -23 "${INSTALLED}" "${COMPARETO}");;
-      orphans) pacman -Rnsc $(pacman -Qtdq);;
+      orphans) ${SUDO_BIN} pacman -Rnsc $(pacman -Qtdq);;
     esac
   ;;
   update)
@@ -126,6 +130,7 @@ case "${1}" in
         ${COMMAND} -p https -l 5 -c "${COUNTRY}" --sort rate --save /etc/pacman.d/mirrorlist
         ${GREP_BIN} '^Server' /etc/pacman.d/mirrorlist | ${SED_BIN} 's/\(.*\)/ \1/g'
       ;;
+      repos) GET_PRIVILEGE && ${SUDO_BIN} pacman -Sy;;
       system) GET_PRIVILEGE && ${SUDO_BIN} pacman -Syu;;
     esac
   ;;
