@@ -91,8 +91,9 @@ if type Xorg &> /dev/null; then
   DTE="Xorg (Unkown/No DE)"
   type pekwm &> /dev/null && DTE="PekWM" # has to be first as it can used stand-alone or with other DEs
   type openbox-session &> /dev/null && DTE="Openbox" # has to be first as it can be used stand-alone or with other DEs
+  type gnome-session &> /dev/null && DTE="GNOME 3" # has to be first as it can be used by DEs based on it
+  type budgie-desktop &> /dev/null && DTE="Budgie"
   type cinnamon-session &> /dev/null && DTE="Cinnamon"
-  type gnome-session &> /dev/null && DTE="GNOME 3"
   type plasma-desktop &> /dev/null && DTE="Plasma 4"
   type plasmashell &> /dev/null && DTE="Plasma 5"
   type startdde &> /dev/null && DTE="Deepin"
