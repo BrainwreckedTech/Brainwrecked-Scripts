@@ -104,6 +104,7 @@ if type Xorg &> /dev/null; then
   type startlxde &> /dev/null && DTE="LXDE"
   type startlxqt &> /dev/null && DTE="LXQt"
   type mate-session &> /dev/null && DTE="MATE"
+  type ukui-session &> /dev/null && DTE="UKUI"
   type startxfce4 &> /dev/null && DTE="XFCE"
 else
   DTE="CLI"
