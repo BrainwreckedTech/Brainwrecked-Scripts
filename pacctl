@@ -105,7 +105,10 @@ case "${1}" in
           fi
           printf '%s\n\n' "Repo archzfs is ${ARCHZFS_STATUS} official."
           GET_PRIVILEGE || exit 1
-          ${SUDO_BIN} pacman -S --needed --noconfirm "${INSTALLED_KERNEL}=${ZFS_KERNEL_VER}" "${INSTALLED_HEADER}=${ZFS_KERNEL_VER}" "zfs-${INSTALLED_KERNEL}=${ZFS_MODULE_VER}" zfs-utils
+          UPGRADED_KERNEL="${INSTALLED_KERNEL}=${ZFS_KERNEL_VER}"
+          [ -n "${INSTALLED_HEADER}" ] && UPGRADED_HEADER="${INSTALLED_HEADER}=${ZFS_KERNEL_VER}"
+          UPGRADED_MODULE="zfs-${INSTALLED_KERNEL}=${ZFS_MODULE_VER}"
+          ${SUDO_BIN} pacman -S --needed --noconfirm ${UPGRADED_KERNEL} ${UPGRADED_HEADER} ${UPGRADED_MODULE} zfs-utils
         else
           echo "Everything is up-to-date."
         fi
