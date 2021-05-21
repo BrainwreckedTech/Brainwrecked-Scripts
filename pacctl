@@ -56,7 +56,7 @@ case "${1}" in
       base-devel) THINK_ABOUT base-devel $(pacman -Sgq base-devel | sort | tr '\n' ' ');;
       base-extra) THINK_ABOUT base-extra linux linux-headers linux-hardened linux-hardened-headers linux-lts linux-lts-headers linux-zen-headers linux-firmware grub refind syslinux nano vim sudo;;
       core) THINK_ABOUT core $(pacman -Slq core | sort | tr '\n' ' ');;
-      expanded-base) printf '%s\n%s\n%s\n' "$(pms list base | tr ' ' '\n')"p "$(pms list base-devel | tr ' ' '\n')" "$(pms list base-extra | tr ' ' '\n')" | sort -u | tr '\n' ' '; echo;;
+      expanded-base) printf '%s\n%s\n%s\n' "$(pacctl list base | tr ' ' '\n')"p "$(pacctl list base-devel | tr ' ' '\n')" "$(pacctl list base-extra | tr ' ' '\n')" | sort -u | tr '\n' ' '; echo;;
       explicit) echo "$(pacman -Qenq | sort | tr '\n' ' ')";;
       modded-configs) pacman -Qii | grep '^MODIFIED' | sed 's/MODIFIED\t//g' ;;
       repo) echo "$(pacman -Slq "${3}" | sort | tr '\n' ' ')";;
@@ -69,9 +69,9 @@ case "${1}" in
     COMPARETO="$(mktemp)"
     GET_PRIVILEGE || exit 1
     case "${2}" in
-      all-but-base) pms list expanded-base | tr ' ' '\n' | sort > "${COMPARETO}"; ${SUDO_BIN} pacman -R $(comm -23 "${INSTALLED}" "${COMPARETO}");;
-      all-but-core) pms list core | tr ' ' '\n' | sort > "${COMPARETO}"; ${SUDO_BIN} pacman -R $(comm -23 "${INSTALLED}" "${COMPARETO}");;
-      all-but-xorg) echo "$(pms list xorg | tr ' ' '\n')${NEWLINE}$(pms list core | tr ' ' '\n')" | sort -u > "${COMPARETO}"; ${SUDO_BIN} pacman -R $(comm -23 "${INSTALLED}" "${COMPARETO}");;
+      all-but-base) pacctl list expanded-base | tr ' ' '\n' | sort > "${COMPARETO}"; ${SUDO_BIN} pacman -R $(comm -23 "${INSTALLED}" "${COMPARETO}");;
+      all-but-core) pacctl list core | tr ' ' '\n' | sort > "${COMPARETO}"; ${SUDO_BIN} pacman -R $(comm -23 "${INSTALLED}" "${COMPARETO}");;
+      all-but-xorg) echo "$(pacctl list xorg | tr ' ' '\n')${NEWLINE}$(pacctl list core | tr ' ' '\n')" | sort -u > "${COMPARETO}"; ${SUDO_BIN} pacman -R $(comm -23 "${INSTALLED}" "${COMPARETO}");;
       orphans) ${SUDO_BIN} pacman -Rnsc $(pacman -Qtdq);;
     esac
   ;;
