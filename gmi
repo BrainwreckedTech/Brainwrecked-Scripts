@@ -39,6 +39,7 @@ PMN="${PMN//\([Tt][Mm]\)/}"	# Remove (TM)
 PMN="${PMN//\([Rr]\)/}"		# Remove (R)
 PMN="${PMN/AMD?/}"		# Remove AMD (already specified in vendor string)
 PMN="${PMN/Intel?/}"		# Remove Intel (already specified in vendor string)
+PMN="${PMN/ APU/}"		# Redundant
 PMN="${PMN/ CPU/}"		# Redundant
 PMN="${PMN/ Processor/}"	# Redundant
 PMN="${PMN/ @*/}"		# Don't @ me ;)
