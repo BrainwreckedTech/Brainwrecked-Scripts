@@ -62,6 +62,9 @@ if [[ ${PMN} = *"with Radeon HD Graphics"* ]]; then
 elif [[ ${PMN} = *"RADEON R"*"COMPUTE CORES"* ]]; then
   CPU=APU
   PMN="${PMN/ RADEON R*COMPUTE CORES*/}"
+elif [[ ${PMN} = *"with Radeon R"* ]]; then
+  CPU=APU
+  PMN="${PMN/ with Radeon R?/}"
 fi
 
 set -e
