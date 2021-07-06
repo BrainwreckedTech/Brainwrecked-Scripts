@@ -92,22 +92,26 @@ case "${1}" in
         REPO_KERNEL_VER="$(pacman -Si "${OFFICIAL_REPO}/${INSTALLED_KERNEL}" | grep 'Version' | sed 's/.*: //g')"
         ZFS_KERNEL_VER="$(pacman -Si "zfs-${INSTALLED_KERNEL}/${INSTALLED_KERNEL}" | grep 'Version' | sed 's/.*: //g')"
         ZFS_MODULE_VER="$(pacman -Si "archzfs/zfs-${INSTALLED_KERNEL}" | grep 'Version' | sed 's/.*: //g')"
+        ZFS_MOD_CORVER="${ZFS_MODULE_VER/*_/}"
         printf '%-30s%-30s\n'   "local/${INSTALLED_KERNEL}"                   "${LOCAL_KERNEL_VER}"
         printf '%-30s%-30s\n'   "${OFFICIAL_REPO}/${INSTALLED_KERNEL}"        "${REPO_KERNEL_VER}"
         printf '%-30s%-30s\n'   "zfs-${INSTALLED_KERNEL}/${INSTALLED_KERNEL}" "${ZFS_KERNEL_VER}"
         printf '%-30s%-30s\n\n' "archzfs/zfs-${INSTALLED_KERNEL}"             "$(echo "${ZFS_MODULE_VER}" | sed 's/.*_//g')"
-        if VERSION_LESSTHAN "${LOCAL_KERNEL_VER}" "${ZFS_KERNEL_VER}"; then
+        if VERSION_LESSTHAN "${LOCAL_KERNEL_VER/.zen*/}" "${ZFS_MOD_CORVER/.zen*/}"; then
           printf '%s\n' "Upgrade to ${INSTALLED_KERNEL} available."
-          if [ "${REPO_KERNEL_VER}" = "${ZFS_KERNEL_VER}" ]; then
+          if [ "${REPO_KERNEL_VER/.zen*/}" = "${ZFS_MOD_CORVER/.zen*/}" ]; then
             ARCHZFS_STATUS="current with"
+            UPGRADED_KERNEL="linux-zen"
+            [ -n "${INSTALLED_HEADER}" ] && UPGRADED_HEADER="${INSTALLED_HEADER}"
+            UPGRADED_MODULE="zfs-${INSTALLED_KERNEL}"
           else
             ARCHZFS_STATUS="behind"
+            UPGRADED_KERNEL="${INSTALLED_KERNEL}=${ZFS_KERNEL_VER}"
+            [ -n "${INSTALLED_HEADER}" ] && UPGRADED_HEADER="${INSTALLED_HEADER}=${ZFS_KERNEL_VER}"
+            UPGRADED_MODULE="zfs-${INSTALLED_KERNEL}=${ZFS_MODULE_VER}"
           fi
           printf '%s\n\n' "Repo archzfs is ${ARCHZFS_STATUS} official."
           GET_PRIVILEGE || exit 1
-          UPGRADED_KERNEL="${INSTALLED_KERNEL}=${ZFS_KERNEL_VER}"
-          [ -n "${INSTALLED_HEADER}" ] && UPGRADED_HEADER="${INSTALLED_HEADER}=${ZFS_KERNEL_VER}"
-          UPGRADED_MODULE="zfs-${INSTALLED_KERNEL}=${ZFS_MODULE_VER}"
           ${SUDO_BIN} pacman -S --needed --noconfirm ${UPGRADED_KERNEL} ${UPGRADED_HEADER} ${UPGRADED_MODULE} zfs-utils
         else
           echo "Everything is up-to-date."
@@ -134,7 +138,7 @@ case "${1}" in
 
         printf " %s\n" "${COUNTRY}"
         printf "\033[1;34m::\033[97m Determining Best Mirrors...\033[0m\n"
-        ${COMMAND} -p https -l 5 -c "${COUNTRY}" --sort rate --save /etc/pacman.d/mirrorlist
+        ${COMMAND} -p https -l 10 -f 5 -c "${COUNTRY}" --sort rate --save /etc/pacman.d/mirrorlist
         ${GREP_BIN} '^Server' /etc/pacman.d/mirrorlist | ${SED_BIN} 's/\(.*\)/ \1/g'
       ;;
       repos) GET_PRIVILEGE && ${SUDO_BIN} pacman -Sy;;
