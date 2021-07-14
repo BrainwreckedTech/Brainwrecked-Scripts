@@ -105,6 +105,7 @@ if type Xorg &> /dev/null; then
   type cinnamon-session &> /dev/null && DTE="Cinnamon"
   type plasma-desktop &> /dev/null && DTE="Plasma 4"
   type plasmashell &> /dev/null && DTE="Plasma 5"
+  type lumina-desktop &> /dev/null && DTE="Lumina"
   type startdde &> /dev/null && DTE="Deepin"
   type startlxde &> /dev/null && DTE="LXDE"
   type startlxqt &> /dev/null && DTE="LXQt"
