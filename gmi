@@ -25,10 +25,12 @@ else
   RAM=$(awk "BEGIN {print int ( $(vmstat -s | grep 'total memory' | cut -dK -f1 | sed 's/  *//g') / 1024 / 1024 * 100 + 0.5 ) / 100 }")
 fi
 
-MHZ=$( ( lscpu | grep 'CPU max MHz' > /dev/null && ( lscpu | grep 'CPU max MHz' | head -n 1 ) || ( lscpu | grep 'CPU MHz' | head -n 1 ) ) | cut -d: -f2 | cut -d. -f1 | sed 's/  *//g;' )
-PMH=00${MHZ}
-PMH=${PMH: -4}
-GHZ="${PMH:0:1}.${PMH:1:2}"
+
+#MHZ=$( ( lscpu | grep 'CPU max MHz' > /dev/null && ( lscpu | grep 'CPU max MHz' | head -n 1 ) || ( lscpu | grep 'CPU MHz' | head -n 1 ) ) | cut -d: -f2 | cut -d. -f1 | sed 's/  *//g;' )
+#PMH=00${MHZ}
+#PMH=${PMH: -4}
+#GHZ="${PMH:0:1}.${PMH:1:2}"
+SPD=$ lscpu | grep "Model name" | cut -d@ -f2 | sed 's/ \+//g' )
 PCC=$(cat /proc/cpuinfo | sort -u | grep -c '^core id')
 PCC=${PCC/0/1} # For ARM devices which don't report core ids
 LCC=$(cat /proc/cpuinfo | grep -c '^processor')
@@ -116,5 +118,5 @@ else
   DTE="CLI"
 fi
 
-echo "${PAT} ${PVN}${PVN//[A-Za-z]*/ }${PMN} ${GHZ}GHz ${PCC}c/${LCC}t ${CPU} with ${RAM}GB RAM running ${DST} ${DTE}"
-
+#echo "${PAT} ${PVN}${PVN//[A-Za-z]*/ }${PMN} ${GHZ}GHz ${PCC}c/${LCC}t ${CPU} with ${RAM}GB RAM running ${DST} ${DTE}"
+echo "${PAT} ${PVN}${PVN//[A-Za-z]*/ }${PMN} ${SPD} ${PCC}c/${LCC}t ${CPU} with ${RAM}GB RAM running ${DST} ${DTE}"
