@@ -18,7 +18,7 @@
 DMIDCBIN="$(command -v dmidecode)"
 
 if [ -n "${DMIDCBIN}" ] && sudo -n "${DMIDCBIN}" -t 17 > /dev/null 2>&1; then
-  RAM=$(awk "BEGIN {print ( $(sudo $(command -v dmidecode) -t 17 | grep 'Size:' | grep -v 'No Module Installed' | sed 's/\s\+//g' | cut -d: -f2 | tr '\n' '+' | sed 's/+$//g;s/GB/*2^20/g;s/MB/*2^10/g') ) / 2^20}" 2> /dev/null)
+  RAM=$(awk "BEGIN {print ( $(sudo $(command -v dmidecode) -t 17 | grep 'Size:' | grep -v 'No Module Installed\|Volatile Size' | sed 's/\s\+//g' | cut -d: -f2 | tr '\n' '+' | sed 's/+$//g;s/GB/*2^20/g;s/MB/*2^10/g') ) / 2^20}" 2> /dev/null)
   [ -z "${RAM}" ] && RAM=$(awk "BEGIN {print int ( $(vmstat -s | grep 'total memory' | cut -dK -f1 | sed 's/  *//g') / 1024 / 1024 * 100 + 0.5 ) / 100 }")
 else
   echo "Add '%$(id -g -n $(whoami)) ALL=(ALL) NOPASSWD:${DMIDCBIN} -t 17' with 'visudo' to get exact RAM capacity." > /dev/stderr
