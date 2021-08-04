@@ -30,7 +30,7 @@ fi
 #PMH=00${MHZ}
 #PMH=${PMH: -4}
 #GHZ="${PMH:0:1}.${PMH:1:2}"
-SPD=$ lscpu | grep "Model name" | cut -d@ -f2 | sed 's/ \+//g' )
+SPD=$(lscpu | grep "Model name" | cut -d@ -f2 | sed 's/ \+//g')
 PCC=$(cat /proc/cpuinfo | sort -u | grep -c '^core id')
 PCC=${PCC/0/1} # For ARM devices which don't report core ids
 LCC=$(cat /proc/cpuinfo | grep -c '^processor')
