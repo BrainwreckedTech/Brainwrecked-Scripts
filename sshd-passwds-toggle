@@ -18,7 +18,7 @@ case "${1}" in
   ;;
 esac
 
-for OPTION in PasswordAuthentication ChallengeResponseAuthentication; do
+for OPTION in PasswordAuthentication ChallengeResponseAuthentication KbdInteractiveAuthentication; do
   sed -i "s/#* *${OPTION} *${FROM}/${OPTION} ${TO}/g; w /dev/stdout" /etc/ssh/sshd_config
 done
 
