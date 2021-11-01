@@ -84,6 +84,7 @@ case "${1}" in
         VERSION_LESSTHAN() {
           [ "${1}" != "${2}" ] && true || false
         }
+        printf "\033[1;34m::\033[97m ZFS Kernel Information:\033[0m\n"
         INSTALLED_KERNEL="$(pacman -Qqs Linux kernel | grep '^linux' | grep -v headers)"
         INSTALLED_HEADER="$(pacman -Qqs Linux kernel | grep headers | grep -v api)"
         LOCAL_KERNEL_VER="$(pacman -Qi "${INSTALLED_KERNEL}" | grep 'Version' | sed 's/.*: //g')"
@@ -95,10 +96,10 @@ case "${1}" in
         ZFS_KERNEL_VER="$(pacman -Si "zfs-${INSTALLED_KERNEL}/${INSTALLED_KERNEL}" | grep 'Version' | sed 's/.*: //g')"
         ZFS_MODULE_VER="$(pacman -Si "archzfs/zfs-${INSTALLED_KERNEL}" | grep 'Version' | sed 's/.*: //g')"
         ZFS_MOD_CORVER="${ZFS_MODULE_VER/*_/}"
-        printf '%-30s%-30s\n'   "local/${INSTALLED_KERNEL}"                   "${LOCAL_KERNEL_VER}"
-        printf '%-30s%-30s\n'   "${OFFICIAL_REPO}/${INSTALLED_KERNEL}"        "${REPO_KERNEL_VER}"
-        printf '%-30s%-30s\n'   "zfs-${INSTALLED_KERNEL}/${INSTALLED_KERNEL}" "${ZFS_KERNEL_VER}"
-        printf '%-30s%-30s\n\n' "archzfs/zfs-${INSTALLED_KERNEL}"             "$(echo "${ZFS_MODULE_VER}" | sed 's/.*_//g')"
+        printf '%-30s%-30s\n'   " local/${INSTALLED_KERNEL}"                   "${LOCAL_KERNEL_VER}"
+        printf '%-30s%-30s\n'   " ${OFFICIAL_REPO}/${INSTALLED_KERNEL}"        "${REPO_KERNEL_VER}"
+        printf '%-30s%-30s\n'   " zfs-${INSTALLED_KERNEL}/${INSTALLED_KERNEL}" "${ZFS_KERNEL_VER}"
+        printf '%-30s%-30s\n\n' " archzfs/zfs-${INSTALLED_KERNEL}"             "$(echo "${ZFS_MODULE_VER}" | sed 's/.*_//g')"
         if [ "${REPO_KERNEL_VER%.zen*}" = "${ZFS_MOD_CORVER%.zen*}" ]; then
           ARCHZFS_STATUS="current with"
           UPGRADED_KERNEL="linux-zen"
@@ -110,12 +111,12 @@ case "${1}" in
           [ -n "${INSTALLED_HEADER}" ] && UPGRADED_HEADER="${INSTALLED_HEADER}=${ZFS_KERNEL_VER}"
           UPGRADED_MODULE="zfs-${INSTALLED_KERNEL}=${ZFS_MODULE_VER}"
         fi
-        printf '%s\n' "Repo archzfs is ${ARCHZFS_STATUS} official."
+        printf '\033[1;33m ->\033[0m Repo archzfs is %s official.\n' "${ARCHZFS_STATUS}"
         if VERSION_LESSTHAN "${LOCAL_KERNEL_VER%.zen*}" "${ZFS_MOD_CORVER%.zen*}"; then
-          printf '%s\n' "Upgrade to ${INSTALLED_KERNEL} available."
+          printf '\033[1;33m ->\033[0m Upgrade to %s available.\n' "${INSTALLED_KERNEL}"
           ${SUDO_BIN} pacman -S --needed --noconfirm ${UPGRADED_KERNEL} ${UPGRADED_HEADER} ${UPGRADED_MODULE} zfs-utils
         else
-          echo "No update available."
+          printf '\033[1;33m ->\033[0m No update available.\n'
         fi
       ;;
       mirror*)
