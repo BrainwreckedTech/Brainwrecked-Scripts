@@ -27,12 +27,12 @@ GET_PRIVILEGE() {
 }
 
 case "${1}" in
-  download)
+  dl|down|download)
     case "${2}" in
       updates) GET_PRIVILEGE && ${SUDO_BIN} pacman -Syuw --noconfirm;;
     esac
     ;;
-  list)
+  ls|list)
     THINK_ABOUT() {
       CATEGORY="${1}"
       shift
@@ -63,7 +63,7 @@ case "${1}" in
       xorg) THINK_ABOUT xorg $(pacman -Sgq xorg | sort | tr '\n' ' ');;
     esac
   ;;
-  remove)
+  rm|rem|remove)
     INSTALLED="$(mktemp)"
     pacman -Qq | sort > "${INSTALLED}"
     COMPARETO="$(mktemp)"
@@ -75,7 +75,7 @@ case "${1}" in
       orphans) ${SUDO_BIN} pacman -Rnsc $(pacman -Qtdq);;
     esac
   ;;
-  update)
+  up|upd|updt|update)
     case "${2}" in
       ignored) pacman -S --needed --noconfirm "$(grep '^IgnorePkg' /etc/pacman.conf | sed 's/.*= //g')";;
       zfs)
@@ -118,7 +118,7 @@ case "${1}" in
           echo "No update available."
         fi
       ;;
-      mirrorlist)
+      mirror*)
         [ -z "${REFLECTOR}" ] && echo "Could not find reflector" && exit 6
         GEOIPURL="http://api.geoiplookup.net/"
 
