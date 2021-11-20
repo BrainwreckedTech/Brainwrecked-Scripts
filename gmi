@@ -25,11 +25,6 @@ else
   RAM=$(awk "BEGIN {print int ( $(vmstat -s | grep 'total memory' | cut -dK -f1 | sed 's/  *//g') / 1024 / 1024 * 100 + 0.5 ) / 100 }")
 fi
 
-
-#MHZ=$( ( lscpu | grep 'CPU max MHz' > /dev/null && ( lscpu | grep 'CPU max MHz' | head -n 1 ) || ( lscpu | grep 'CPU MHz' | head -n 1 ) ) | cut -d: -f2 | cut -d. -f1 | sed 's/  *//g;' )
-#PMH=00${MHZ}
-#PMH=${PMH: -4}
-#GHZ="${PMH:0:1}.${PMH:1:2}"
 if lscpu | grep "Model name" | grep -q '@'; then
   SPD=$(lscpu | grep "Model name" | cut -d@ -f2 | sed 's/ \+//g')
 else
