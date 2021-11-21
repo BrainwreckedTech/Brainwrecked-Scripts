@@ -35,9 +35,14 @@ fi
 if lscpu | grep "Model name" | grep -q '@'; then
   SPD=$(lscpu | grep "Model name" | cut -d@ -f2 | sed 's/ \+//g')
 else
-  SPD=$(lscpu | grep "CPU max MHz" | cut -d: -f2 | cut -d. -f1 | sed 's/ \+//g')
-  SPD="$((SPD/1000)).$((((SPD%1000)+5)/10))GHz"
+  for MHZ in $(lscpu | grep "CPU max MHz" | cut -d: -f2 | cut -d. -f1 | sed 's/ \+//g'); do
+    [ -n "${SPD}" ] && SPD+=" "
+    SPD+="$((MHZ/1000)).$((((MHZ%1000)+5)/10))GHz"
+  done
 fi
+
+SPA=(${SPD})
+
 PCC=$(cat /proc/cpuinfo | sort -u | grep -c '^core id')
 PCC=${PCC/0/1} # For ARM devices which don't report core ids
 LCC=$(cat /proc/cpuinfo | grep -c '^processor')
@@ -62,6 +67,8 @@ shopt -s extglob
 PMN="${PMN/ +([A-Za-z])?Core/}"	# Remove [n] Core (already specified with $PCC)
 PMN="${PMN/ version +([0-9]).+([0-9])/}"	# Remove version string
 shopt -u extglob
+PMN="${PMN/ /_}"
+PMA=(${PMN/$'\n'/ })
 
 CPU=CPU
 
@@ -125,5 +132,9 @@ else
   DTE="CLI"
 fi
 
-#echo "${PAT} ${PVN}${PVN//[A-Za-z]*/ }${PMN} ${GHZ}GHz ${PCC}c/${LCC}t ${CPU} with ${RAM}GB RAM running ${DST} ${DTE}"
-echo "${PAT} ${PVN}${PVN//[A-Za-z]*/ }${PMN} ${SPD} ${PCC}c/${LCC}t ${CPU} with ${RAM}GB RAM running ${DST} ${DTE}"
+printf '%s %s'  "${PAT}" "${PVN}${PVN//[A-Za-z]*/ }"
+for (( LC=0 ; LC < ${#PMA[@]} ; LC++ )); do
+  [ ${LC} -gt 0 ] && printf ' + '
+  printf '%s %s' "${PMA[${LC}]/_/ }" "${SPA[${LC}]}"
+done
+echo " ${PCC}c/${LCC}t ${CPU} with ${RAM}GB RAM running ${DST} ${DTE}"
