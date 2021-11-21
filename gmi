@@ -43,7 +43,8 @@ fi
 
 SPA=(${SPD})
 
-PCC=$(cat /proc/cpuinfo | sort -u | grep -c '^core id')
+NOP=$(lscpu | grep -c 'Model name:')
+PCC=$(sort -u /proc/cpuinfo | grep -c '^core id')
 PCC=${PCC/0/1} # For ARM devices which don't report core ids
 LCC=$(cat /proc/cpuinfo | grep -c '^processor')
 DST="$(uname -m | sed 's/^x86_64$/x64v1/g;s/x86_64-v/x64/g') $(cat /etc/os-release | grep PRETTY_NAME | cut -d\" -f2)"
@@ -137,4 +138,4 @@ for (( LC=0 ; LC < ${#PMA[@]} ; LC++ )); do
   [ ${LC} -gt 0 ] && printf ' + '
   printf '%s %s' "${PMA[${LC}]/_/ }" "${SPA[${LC}]}"
 done
-echo " ${PCC}c/${LCC}t ${CPU} with ${RAM}GB RAM running ${DST} ${DTE}"
+echo " $((PCC*NOP))c/${LCC}t ${CPU} with ${RAM}GB RAM running ${DST} ${DTE}"
