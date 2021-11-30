@@ -68,7 +68,7 @@ shopt -s extglob
 PMN="${PMN/ +([A-Za-z])?Core/}"	# Remove [n] Core (already specified with $PCC)
 PMN="${PMN/ version +([0-9]).+([0-9])/}"	# Remove version string
 shopt -u extglob
-PMN="${PMN/ /_}"
+PMN="${PMN// /_}"
 PMA=(${PMN/$'\n'/ })
 
 CPU=CPU
@@ -136,6 +136,6 @@ fi
 printf '%s %s'  "${PAT}" "${PVN}${PVN//[A-Za-z]*/ }"
 for (( LC=0 ; LC < ${#PMA[@]} ; LC++ )); do
   [ ${LC} -gt 0 ] && printf ' + '
-  printf '%s %s' "${PMA[${LC}]/_/ }" "${SPA[${LC}]}"
+  printf '%s %s' "${PMA[${LC}]//_/ }" "${SPA[${LC}]}"
 done
 echo " $((PCC*NOP))c/${LCC}t ${CPU} with ${RAM}GB RAM running ${DST} ${DTE}"
