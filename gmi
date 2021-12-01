@@ -68,21 +68,22 @@ shopt -s extglob
 PMN="${PMN/ +([A-Za-z])?Core/}"	# Remove [n] Core (already specified with $PCC)
 PMN="${PMN/ version +([0-9]).+([0-9])/}"	# Remove version string
 shopt -u extglob
-PMN="${PMN// /_}"
-PMA=(${PMN/$'\n'/ })
 
 CPU=CPU
 
-if [[ ${PMN} = *"with_Radeon_HD_Graphics"* ]]; then
+if [[ ${PMN} = *"with Radeon HD Graphics"* ]]; then
   CPU=APU
-  PMN="${PMN/_with_Radeon_HD_Graphics/}"
-elif [[ ${PMN} = *"RADEON_R"*"COMPUTE_CORES"* ]]; then
+  PMN="${PMN/ with Radeon HD Graphics/}"
+elif [[ ${PMN} = *"RADEON R"*"COMPUTE CORES"* ]]; then
   CPU=APU
-  PMN="${PMN/_RADEON_R*COMPUTE_CORES*/}"
-elif [[ ${PMN} = *"with_Radeon_R"* ]]; then
+  PMN="${PMN/ RADEON R*COMPUTE CORES*/}"
+elif [[ ${PMN} = *"with Radeon R"* ]]; then
   CPU=APU
-  PMN="${PMN/_with_Radeon_R?/}"
+  PMN="${PMN/ with Radeon R?/}"
 fi
+
+PMN="${PMN// /_}"
+PMA=(${PMN/$'\n'/ })
 
 set -e
 flags=$(grep '^flags\b' < /proc/cpuinfo | head -n 1)
