@@ -73,15 +73,15 @@ PMA=(${PMN/$'\n'/ })
 
 CPU=CPU
 
-if [[ ${PMN} = *"with Radeon HD Graphics"* ]]; then
+if [[ ${PMN} = *"with_Radeon_HD_Graphics"* ]]; then
   CPU=APU
-  PMN="${PMN/ with Radeon HD Graphics/}"
-elif [[ ${PMN} = *"RADEON R"*"COMPUTE CORES"* ]]; then
+  PMN="${PMN/_with_Radeon_HD_Graphics/}"
+elif [[ ${PMN} = *"RADEON_R"*"COMPUTE_CORES"* ]]; then
   CPU=APU
-  PMN="${PMN/ RADEON R*COMPUTE CORES*/}"
-elif [[ ${PMN} = *"with Radeon R"* ]]; then
+  PMN="${PMN/_RADEON_R*COMPUTE_CORES*/}"
+elif [[ ${PMN} = *"with_Radeon_R"* ]]; then
   CPU=APU
-  PMN="${PMN/ with Radeon R?/}"
+  PMN="${PMN/_with_Radeon_R?/}"
 fi
 
 set -e
