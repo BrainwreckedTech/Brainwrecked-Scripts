@@ -57,16 +57,17 @@ PMN="${PMN/Intel?/}"		# Remove Intel (already specified in vendor string)
 PMN="${PMN/ APU/}"		# Redundant
 PMN="${PMN/ CPU/}"		# Redundant
 PMN="${PMN/ Processor/}"	# Redundant
+PMN="${PMN/  @/ @}"		# Condense space before @
 PMN="${PMN/ @*/}"		# Don't @ me ;)
 PMN="${PMN/ *[GM]Hz/}"		# Remove MHz speed (already specified with $GHZ)
 PMN="${PMN/CentaurHauls /}"	# Remove CentaurHauls
 PMN="${PMN/\(/}"		# Remove opening parenthesis
 PMN="${PMN/\)/}"		# Remove closing parenthesis
 PMN="${PMN/Pentium/P-}"		# Replace Pentium with P- (eg, Pentium III -> P-III)
-PMN="${PMN/  / }"		# Reduce spacing
 shopt -s extglob
 PMN="${PMN/ +([A-Za-z])?Core/}"	# Remove [n] Core (already specified with $PCC)
 PMN="${PMN/ version +([0-9]).+([0-9])/}"	# Remove version string
+PMN="${PMN/+( )/ }"		# Reduce multiple spaces to one
 shopt -u extglob
 
 CPU=CPU
