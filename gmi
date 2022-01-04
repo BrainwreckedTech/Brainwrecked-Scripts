@@ -23,7 +23,7 @@ if [ -n "${DMIDCBIN}" ] && sudo -n "${DMIDCBIN}" -t 17 > /dev/null 2>&1; then
 elif [ -d "/sys/devices/system/memory" ]; then
   for MEMORIES in /sys/devices/system/memory/memory*; do
     if [[ $(< "${MEMORIES}/online") == 1 ]]; then
-      ((TOTALRAM+=0x$("${BIN[cat]}" /sys/devices/system/memory/block_size_bytes)))
+      ((TOTALRAM+=0x$(cat /sys/devices/system/memory/block_size_bytes)))
     fi
   done
   RAM=$(awk "BEGIN {print ${TOTALRAM} / 1024 ^ 2}")
