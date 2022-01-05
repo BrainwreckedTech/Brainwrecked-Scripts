@@ -26,7 +26,7 @@ elif [ -d "/sys/devices/system/memory" ]; then
       ((TOTALRAM+=0x$(cat /sys/devices/system/memory/block_size_bytes)))
     fi
   done
-  RAM=$(awk "BEGIN {print ${TOTALRAM} / 1024 ^ 2}")
+  RAM=$(awk "BEGIN {print ${TOTALRAM} / 1024 ^ 3}")
 else
   grep -q ARMv /proc/cpuinfo || echo "Add '%$(id -g -n $(whoami)) ALL=(ALL) NOPASSWD:${DMIDCBIN} -t 17' with 'visudo' to get exact RAM capacity." > /dev/stderr
   RAM=$(awk "BEGIN {print int ( $(vmstat -s | grep 'total memory' | cut -dK -f1 | sed 's/  *//g') / 1024 / 1024 * 100 + 0.5 ) / 100 }")
