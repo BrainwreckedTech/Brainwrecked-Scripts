@@ -72,7 +72,11 @@ case "${1}" in
       all-but-base) pacctl list expanded-base | tr ' ' '\n' | sort > "${COMPARETO}"; ${SUDO_BIN} pacman -R $(comm -23 "${INSTALLED}" "${COMPARETO}");;
       all-but-core) pacctl list core | tr ' ' '\n' | sort > "${COMPARETO}"; ${SUDO_BIN} pacman -R $(comm -23 "${INSTALLED}" "${COMPARETO}");;
       all-but-xorg) echo "$(pacctl list xorg | tr ' ' '\n')${NEWLINE}$(pacctl list core | tr ' ' '\n')" | sort -u > "${COMPARETO}"; ${SUDO_BIN} pacman -R $(comm -23 "${INSTALLED}" "${COMPARETO}");;
-      orphans) ${SUDO_BIN} pacman -Rnsc $(pacman -Qtdq);;
+      orphans)
+        PKG_LIST="$(pacman -Qtqd 2> /dev/null)"
+        [ -z "${PKG_LIST}" ] && echo "No orphaned packages found." && exit 0
+        ${SUDO_BIN} pacman -Rnsc ${PKG_LIST}
+        ;;
     esac
   ;;
   up|upd|updt|update)
