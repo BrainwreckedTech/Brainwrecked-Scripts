@@ -106,7 +106,7 @@ case "${1}" in
         printf '%-30s%-30s\n\n' " archzfs/zfs-${INSTALLED_KERNEL}"             "$(echo "${ZFS_MODULE_VER}" | sed 's/.*_//g')"
         if [ "${REPO_KERNEL_VER%.zen*}" = "${ZFS_MOD_CORVER%.zen*}" ]; then
           ARCHZFS_STATUS="current with"
-          UPGRADED_KERNEL="linux-zen"
+          UPGRADED_KERNEL="${INSTALLED_KERNEL}"
           [ -n "${INSTALLED_HEADER}" ] && UPGRADED_HEADER="${INSTALLED_HEADER}"
           UPGRADED_MODULE="zfs-${INSTALLED_KERNEL}"
         else
