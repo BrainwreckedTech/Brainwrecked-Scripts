@@ -100,10 +100,12 @@ case "${1}" in
         ZFS_KERNEL_VER="$(pacman -Si "zfs-${INSTALLED_KERNEL}/${INSTALLED_KERNEL}" | grep 'Version' | sed 's/.*: //g')"
         ZFS_MODULE_VER="$(pacman -Si "archzfs/zfs-${INSTALLED_KERNEL}" | grep 'Version' | sed 's/.*: //g')"
         ZFS_MOD_CORVER="$(pacman -Si "zfs-${INSTALLED_KERNEL}" | grep 'Depends' | tr ' ' '\n' | grep "${INSTALLED_KERNEL}" | cut -d= -f2)"
+        ZFS_UTILS_VRSN="$(pacman -Si "zfs-utils" | grep 'Version' | sed 's/ //g' | cut -d: -f2)"
         printf '%-30s%-30s\n'   " local/${INSTALLED_KERNEL}"                   "${LOCAL_KERNEL_VER}"
         printf '%-30s%-30s\n'   " ${OFFICIAL_REPO}/${INSTALLED_KERNEL}"        "${REPO_KERNEL_VER}"
         printf '%-30s%-30s\n'   " zfs-${INSTALLED_KERNEL}/${INSTALLED_KERNEL}" "${ZFS_KERNEL_VER}"
-        printf '%-30s%-30s\n\n' " archzfs/zfs-${INSTALLED_KERNEL}"             "$(echo "${ZFS_MODULE_VER}" | sed 's/.*_//g')"
+        printf '%-30s%-30s\n'   " archzfs/zfs-${INSTALLED_KERNEL}"             "$(echo "${ZFS_MODULE_VER}" | sed 's/.*_//g')"
+        printf '%-30s%-30s\n\n' " zfs-${INSTALLED_KERNEL}/zfs-utils"           "${ZFS_UTILS_VRSN%%-*}"
         if [ "${REPO_KERNEL_VER%.zen*}" = "${ZFS_MOD_CORVER%.zen*}" ]; then
           ARCHZFS_STATUS="current with"
           UPGRADED_KERNEL="${INSTALLED_KERNEL}"
@@ -113,7 +115,7 @@ case "${1}" in
           ARCHZFS_STATUS="behind"
           UPGRADED_KERNEL="${INSTALLED_KERNEL}=${ZFS_MOD_CORVER}"
           [ -n "${INSTALLED_HEADER}" ] && UPGRADED_HEADER="${INSTALLED_HEADER}=${ZFS_MOD_CORVER}"
-          UPGRADED_MODULE="zfs-${INSTALLED_KERNEL}=${ZFS_MOD_CORVER}"
+          UPGRADED_MODULE="zfs-${INSTALLED_KERNEL}=${ZFS_UTILS_VRSN%%-*}_${ZFS_MOD_CORVER}"
         fi
         printf '\033[1;33m ->\033[0m Repo archzfs is %s official.\n' "${ARCHZFS_STATUS}"
         if VERSION_LESSTHAN "${LOCAL_KERNEL_VER%.zen*}" "${ZFS_MOD_CORVER%.zen*}"; then
