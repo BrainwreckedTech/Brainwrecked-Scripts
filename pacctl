@@ -84,7 +84,7 @@ case "${1}" in
       ignored) pacman -S --needed --noconfirm "$(grep '^IgnorePkg' /etc/pacman.conf | sed 's/.*= //g')";;
       zfs)
         GET_PRIVILEGE || exit 1
-        ${SUDO_BIN} pacman -Sy
+        ${SUDO_BIN} pacman -Sy || exit 2
         VERSION_LESSTHAN() {
           [ "${1}" != "${2}" ] && true || false
         }
