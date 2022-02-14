@@ -36,7 +36,7 @@ case "${1}" in
     THINK_ABOUT() {
       CATEGORY="${1}"
       shift
-      for PACKAGE in $@; do
+      for PACKAGE in ${@}; do
         printf '\033[2K\rThinking about %s:%s' "${CATEGORY}" "${PACKAGE}" > /dev/stderr
         pactree -ul "${PACKAGE}" > /dev/null 2>&1 && OPTS=ul || OPTS=sul
         NEW_PACKAGES="$(pactree "-${OPTS}" "${PACKAGE}")"
