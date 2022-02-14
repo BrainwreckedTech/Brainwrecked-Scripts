@@ -154,7 +154,11 @@ case "${1}" in
         ${GREP_BIN} '^Server' /etc/pacman.d/mirrorlist | ${SED_BIN} 's/\(.*\)/ \1/g'
       ;;
       repos) GET_PRIVILEGE && ${SUDO_BIN} pacman -Sy;;
-      system) GET_PRIVILEGE && ${SUDO_BIN} pacman -Syu;;
+      system)
+        GET_PRIVILEGE
+        ${SUDO_BIN} pacman -Sy --needed archlinux-keyring
+        pacman -Qi chaotic-keyring > /dev/null 2>&1 && ${SUDO_BIN} pacman -S --needed chaotic-keyring
+        ${SUDO_BIN} pacman -Su;;
     esac
   ;;
 esac
