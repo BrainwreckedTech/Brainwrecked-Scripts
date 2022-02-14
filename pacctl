@@ -52,14 +52,14 @@ case "${1}" in
     }
 
     case "${2}" in
-      base) echo "$(pactree -ul base | sort | tr '\n' ' ')";;
+      base) pactree -ul base | sort | tr '\n' ' ';;
       base-devel) THINK_ABOUT base-devel $(pacman -Sgq base-devel | sort | tr '\n' ' ');;
       base-extra) THINK_ABOUT base-extra linux linux-headers linux-hardened linux-hardened-headers linux-lts linux-lts-headers linux-zen-headers linux-firmware grub refind syslinux nano vim sudo;;
       core) THINK_ABOUT core $(pacman -Slq core | sort | tr '\n' ' ');;
       expanded-base) printf '%s\n%s\n%s\n' "$(pacctl list base | tr ' ' '\n')"p "$(pacctl list base-devel | tr ' ' '\n')" "$(pacctl list base-extra | tr ' ' '\n')" | sort -u | tr '\n' ' '; echo;;
-      explicit) echo "$(pacman -Qenq | sort | tr '\n' ' ')";;
+      explicit) pacman -Qenq | sort | tr '\n' ' ';;
       modded-configs) pacman -Qii | grep '^MODIFIED' | sed 's/MODIFIED\t//g' ;;
-      repo) echo "$(pacman -Slq "${3}" | sort | tr '\n' ' ')";;
+      repo) pacman -Slq "${3}" | sort | tr '\n' ' ';;
       xorg) THINK_ABOUT xorg $(pacman -Sgq xorg | sort | tr '\n' ' ');;
     esac
   ;;
