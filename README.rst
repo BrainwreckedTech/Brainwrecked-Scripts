@@ -9,7 +9,7 @@ All scripts licensed under the GPL v3 unless otherwise stated.
 If you're wondering what happened to a script you could have sworn you
 found here before, jump to the bottom for a list of deprecated scripts.
 
-Active scripts
+Active Scripts
 --------------
 
 These are scripts that I use with at least moderate frequency, so I'll
@@ -33,9 +33,6 @@ notice any problems that crop up rather quickly.
 ``get-systemd-services``
   Shortcut to list systemd services (omit systemd-*.service)
 
-``git-auto-add-commit-push``
-  Add files to, commit, and push to a git repo
-
 ``gmi``
   Get Machine Info - Prints a line with HW/OS info
 
@@ -48,14 +45,8 @@ notice any problems that crop up rather quickly.
 ``iptmod``
   Changes firewall rules
 
-``monitor_off``
-  Turn off monitor (Vinicius, license unknown)
-
 ``myip4``
   Gets IP addresses (local and public)
-
-``mysql-backup``
-  Backup a MySQL database with individual files for each table
 
 ``netinfo``
   Displays network information (udev/networkd/et al).
@@ -63,11 +54,26 @@ notice any problems that crop up rather quickly.
 ``pacctl``
   Pacman helper
 
-``sendEmail``
-  Send email from CLI (Brandon Zehm, GPL v2)
-
 ``xcbmanip``
   Manipulates the X Clipboard.
+
+Inactive Scripts
+----------------
+
+These are scripts I haven't used in some time.  If they stop working,
+I'll remove them.
+
+``git-auto-add-commit-push``
+  Add files to, commit, and push to a git repo
+
+``monitor_off``
+  Turn off monitor (Vinicius, license unknown)
+
+``mysql-backup``
+  Backup a MySQL database with individual files for each table
+
+``sendEmail``
+  Send email from CLI (Brandon Zehm, GPL v2)
 
 Deprecated Scripts
 ------------------
