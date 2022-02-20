@@ -1,6 +1,6 @@
 #!/bin/bash
 if type gcc &> /dev/null; then
-  gcc -c -Q -march=native --help=target | grep march | sed 's/\s\s*//g' | cut -d= -f2
+  gcc -c -Q -march=native --help=target | grep march | grep -v option | sed 's/\s\s*//g' | cut -d= -f2
   rm help-dummy.o
 else
   echo "GCC is not installed."
