@@ -24,9 +24,6 @@ notice any problems that crop up rather quickly.
 ``convert2ico``
   Converts an image to .ico format
 
-``erc``
-  Edit Root Crontab.  Shortcut for editing root's crontab with nano.
-
 ``fakefiletime``
   Fake a file's time relative to other files.
 
@@ -62,6 +59,9 @@ Inactive Scripts
 
 These are scripts I haven't used in some time.  If they stop working,
 I'll remove them.
+
+``erc``
+  Edit Root Crontab.  Shortcut for editing root's crontab with nano.
 
 ``git-auto-add-commit-push``
   Add files to, commit, and push to a git repo
