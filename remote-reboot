@@ -1,2 +1,0 @@
-sudo bash -c "shutdown -r &"
-exit

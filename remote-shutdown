@@ -1,3 +1,0 @@
-#!/usr/bin/env sh
-
-sudo bash -c 'shutdown -h &'
