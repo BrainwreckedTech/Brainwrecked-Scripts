@@ -12,6 +12,9 @@ found here before, jump to the bottom for a list of deprecated scripts.
 Active scripts
 --------------
 
+These are scripts that I use with at least moderate frequency, so I'll
+notice any problems that crop up rather quickly.
+
 ``archtype``
   List system CPU architecture, reported by GCC
 
@@ -68,6 +71,9 @@ Active scripts
 
 Deprecated Scripts
 ------------------
+
+These scripts either moved elsewhere or fell into such disuse that they
+have most likely become obsolete.
 
 ``bdmap``
   Evolved to ``scsictl`` at https://git.bwt.com.de/bwt/disk
