@@ -21,9 +21,6 @@ Active scripts
 ``convert2ico``
   Converts an image to .ico format
 
-``cur-linux-ver``
-  Prints current linux kernel version
-
 ``erc``
   Edit Root Crontab.  Shortcut for editing root's crontab with nano.
 
@@ -80,6 +77,9 @@ Deprecated Scripts
 
 ``ckinfo``
   Deleted as I stopped using ck-patched kernels a long time ago and haven't kept up
+
+``cur-linux-ver``
+  Used in conjunction with ck-patched kernels.  See ``ckinfo``
 
 ``cp2chroot``
   Moved to https://git.bwt.com.de/bwt/ssh
