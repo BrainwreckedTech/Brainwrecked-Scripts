@@ -31,7 +31,7 @@ Active scripts
   Fake a file's time relative to other files.
 
 ``get-systemd-services``
-  List systemd services (name only, skip systemd*)
+  Shortcut to list systemd services (omit systemd-*.service)
 
 ``git-auto-add-commit-push``
   Add files to, commit, and push to a git repo

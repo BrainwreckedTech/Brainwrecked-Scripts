@@ -1,2 +1,2 @@
-#!/bin/bash
-systemctl | grep '\.service' | grep -v ^systemd | cut -d\  -f1
+#!/bin/sh
+systemctl list-units --type=service | grep -v '^  systemd'
