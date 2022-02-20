@@ -1,35 +1,63 @@
 # A program to temporarily modify an IPTables firewall.
-# Port list is gathered from /etc/iptmod
 
-# Usage: iptmod [ A | D ] [ip-list] [services]
-#
-#   A or D     Add or Delete rules
-#
-#   ip-list    Comma-seperated list of IPs to open ports for
-#
-#   services   Comma-seperated list of services to open for [ip-list]
+for ARGUMENT; do
+  if  [ "${ARGUMENT}" == '-h' ] || [ "${ARGUMENT}" == '--help' ]; then
+    echo "${0} <action> <clients> <services>"
+    echo
+    echo "   action    add or remove (several shortcuts accepted)"
+    echo "   clients   comma-separated list of addresses or resolvable names"
+    echo "   service   comma-separated list of services to open up (or all to affect all)"
+    echo
+    echo " The following service names are recognized:"
+    echo
+    echo "   dlna,nfs,pop3,samba,sshd"
+    echo
+    echo " The following service groups are recognized:"
+    echo
+    echo "   getfiles   nfs4 + samba"
+    echo "   getmail    imap + pop3"
+    echo "   getmails   imamps + pop3s"
+    echo "   sendmail   smtp + getmail"
+    echo "   sendmails  smtps + getmails"
+    echo "   www        http + https"
+    exit 0
+  fi
+  [ -z "${REQ_ACTN}" ] && REQ_ACTN="${ARGUMENT}" && continue
+  [ -z "${NCLIENTS}" ] && NCLIENTS="${ARGUMENT}" && continue
+  [ -z "${SERVICES}" ] && SERVICES="${ARGUMENT}" || SERVICES="${SERVICES} ${ARGUMENT}"
+done
 
-IPT=iptables
-OFS="$IFS"
+case "${REQ_ACTN}" in
+                         A|a|add) RULEACTN=A;;
+  D|d|del|delete|r|rm|rem|remove) RULEACTN=D;;
+                               *) echo "Unknown rule action '${REQ_ACTN}'" && exit 1;;
+esac
+
 IFS=","
-MOD=$1
 
 function openports() {
-  for PORT in $1; do
-    sudo iptables -$MOD UDP -s $ADDR -p udp -m udp --dport $PORT -j ACCEPT
-    sudo iptables -$MOD TCP -s $ADDR -p tcp -m tcp --dport $PORT -j ACCEPT
+  for IP_PORT in ${1}; do
+    sudo iptables -${RULEACTN} UDP -s ${LNCLIENT} -p udp -m udp --dport ${IP_PORT} -j ACCEPT
+    sudo iptables -${RULEACTN} TCP -s ${LNCLIENT} -p tcp -m tcp --dport ${IP_PORT} -j ACCEPT
   done
 }
 
-for ADDR in $2;  do
-  for SRVC in $3; do
-    [[ $SRVC == pop3  || $SRVC == all ]] && openports "110"
-    [[ $SRVC == samba || $SRVC == all ]] && openports "137:139,445"
-    [[ $SRVC == nfs   || $SRVC == all ]] && openports "111,1110,2049,3095,4045"
-    [[ $SRVC == dlna  || $SRVC == all ]] && openports "8200"
-    [[ $SRVC == btwsq || $SRVC == all ]] && openports "8888"
-    [[ $SRVC == sshd  || $SRVC == all ]] && openports "$(grep '^Port' /etc/ssh/sshd_config | sed 's/\s+/ /g' | cut -d\  -f2)"
-  done
-done
+SSHDPORT=$(grep '^Port' /etc/ssh/sshd_config | sed 's/\s+/ /g' | cut -d\  -f2)"
 
-IFS="$OFS"
+for LNCLIENT in ${NCLIENTS};  do
+  case ${SERVICES} in
+                                *,dlna,*|*,all,*) openports "8200";;
+                        *,http,*|*,www,*|*,all,*) openports "80";;
+                       *,https,*|*,www,*|*,all,*) openports "443";;
+                    *,imap,*|*,getmail*,|*,all,*) openports "143" ;;
+                  *,imaps,*|*,getmails*,|*,all,*) openports "993" ;;
+                                *,nfs3,*|*,all,*) openports "111,2049,20048,32765,32803";;
+                   *,nfs4,*|*,getfiles,*|*,all,*) openports "2049";;
+                    *,pop3,*|*,getmail*,|*,all,*) openports "110" ;;
+                  *,pop3s,*|*,getmails*,|*,all,*) openports "995" ;;
+                  *,samba,*|*,getfiles*,|*,all,*) openports "137:139,445" ;;
+       *,smtp,*|*,getmail,*|*,sendmail,*|*,all,*) openports "25,26" ;;
+    *,smtps,*|*,getmails,*|*,sendmails,*|*,all,*) openports "465" ;;
+                                *,sshd,*|*,all,*) openports "${SSHDPORT}";;
+  esac
+done
