@@ -99,8 +99,6 @@ ckflags() {
   done
 }
 
-# Actually vme only denotes an i386, but modern code won't run on those, so...
-ckflags vme && PAT=i486 && \
 ckflags cx8 fpu mmx && PAT=i586 && \
 ckflags cmov fxsr sse && PAT=i686 && \
 ckflags sse2 && PAT=i786 && \
