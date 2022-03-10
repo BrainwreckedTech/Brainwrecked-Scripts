@@ -5,20 +5,17 @@
 # ${0} remove <all-but-base|all-but-core|all-but-xorg|orphans>
 # ${0} update <ignored|mirrorlist|system|zfs>
 
+MISSING='false'
 NEWLINE='
 '
 
-[ -e /usr/bin/comm ] || echo "Could not find comm" && exit 2
-[ -e /usr/bin/curl ] || echo "Could not find curl" && exit 2
-[ -e /bin/grep ] || echo "Could not find grep" && exit 3
-[ -e /usr/bin/pacman ] || echo "Could not find pacman" && exit 5
-[ -e /usr/bin/pactree ] || echo "Could not find pactree" && exit 5
-[ -e /usr/bin/printf ] || echo "Could not find printf" && exit 5
-[ -e /usr/bin/reflector ] || echo "Could not find reflector" && exit 5
-[ -e /bin/sed ] || echo "Could not find sed" && exit 7
-[ -e /usr/bin/sort ] || echo "Could not find sort" && exit 5
-[ -e /usr/bin/sudo ] || echo "Could not find sudo" && exit 5
-[ -e /usr/bin/tr ] || echo "Could not find tr" && exit 5
+for BINARY in comm curl pacman pactree printf reflector sort sudo tr; do
+  CMD_PATH="/usr/bin/${BINARY}"
+  [ "${BINARY}" = "grep" ] || [ "${BINARY}" = "sed" ] && CMD_PATH="/bin/${CMD_PATH}"
+  [ ! -e "${CMD_PATH}" ] && echo "Could not find ${CMD_PATH}" && MISSING='true'
+done
+
+${MISSING} && exit 1
 
 GET_PRIVILEGE() {
   while ! /usr/bin/sudo true; do
