@@ -9,7 +9,7 @@ MISSING='false'
 NEWLINE='
 '
 
-for BINARY in comm curl pacman pactree printf reflector sort sudo tr; do
+for BINARY in comm curl pacman pactree printf sort sudo tr; do
   CMD_PATH="/usr/bin/${BINARY}"
   [ "${BINARY}" = "grep" ] || [ "${BINARY}" = "sed" ] && CMD_PATH="/bin/${CMD_PATH}"
   [ ! -e "${CMD_PATH}" ] && echo "Could not find ${CMD_PATH}" && MISSING='true'
@@ -141,7 +141,7 @@ case "${1}" in
 
         /usr/bin/printf " %s\n" "${COUNTRY}"
         /usr/bin/printf "\033[1;34m::\033[97m Determining Best Mirrors...\033[0m\n"
-        /usr/bin/sudo /usr/bin/reflector -p https -l 10 -f 5 -c "${COUNTRY}" -x mirror.theash.xyz -x ftp.sudhip.com -x dfw.mirror.rackspace.com --sort rate --save /etc/pacman.d/mirrorlist
+        [ -e /usr/bin/reflector ] && /usr/bin/sudo /usr/bin/reflector -p https -l 10 -f 5 -c "${COUNTRY}" -x mirror.theash.xyz -x ftp.sudhip.com -x dfw.mirror.rackspace.com --sort rate --save /etc/pacman.d/mirrorlist
         /bin/grep '^Server' /etc/pacman.d/mirrorlist | /bin/sed 's/\(.*\)/ \1/g'
       ;;
       repos) GET_PRIVILEGE && /usr/bin/sudo /usr/bin/pacman -Sy;;
