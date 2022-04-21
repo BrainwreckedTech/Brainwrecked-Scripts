@@ -26,6 +26,40 @@ GET_PRIVILEGE() {
 case "${1}" in
   dl|down|download)
     case "${2}" in
+      kernel)
+        GEOIPURL="http://api.geoiplookup.net/"
+        GET_PRIVILEGE || exit 1
+        if [ -n "${3}" ]; then
+          /usr/bin/printf "\033[1;34m::\033[97m User-determined county...\033[0m\n"
+          COUNTRY="${3}"
+        else
+          /usr/bin/printf "\033[1;34m::\033[97m Geolocating county...\033[0m\n"
+          COUNTRY="$(/usr/bin/curl -s ${GEOIPURL} | /bin/grep countryname | /bin/sed 's/.*<countryname>\(.*\)<\/countryname>.*/\1/g')"
+        fi
+        /usr/bin/printf " %s\n" "${COUNTRY}"
+
+        /usr/bin/printf "\033[1;34m::\033[97m Determining Best Mirror...\033[0m\n"
+        SRVR_OUT="$(/usr/bin/reflector -p rsync -c "${COUNTRY}" -l 10 -f 5 --sort rate)"
+        SRVR_LIN="$(echo "$SRVR_OUT" | /bin/grep '^Server' | /usr/bin/head -1)"
+        SRVR_STR="$(echo "$SRVR_LIN" | /usr/bin/rev | /usr/bin/cut -d\  -f1 | /usr/bin/cut -d/ -f 4- | /usr/bin/rev)"
+
+        SYS_ARCH="$(/bin/uname -m)"
+        KRNL_PKG="$(/usr/bin/pacman -Qs 'linux' | /bin/grep 'local/linux' | /bin/grep -v 'headers\|firmware' | /usr/bin/cut -d\  -f1 | /usr/bin/cut -d/ -f2)"
+        PKG_REPO='core'
+        [ "${KRNL_PKG}" = "linux-hardened" ] || [ "${KRNL_PKG}" = "linux-zen" ] && PKG_REPO='extra'
+        PKG_VRSN="$(/usr/bin/pacman -Si "${PKG_REPO}/${KRNL_PKG}" | /bin/grep Version | /usr/bin/rev | /usr/bin/cut -d\  -f1 | /usr/bin/rev)"
+        PKG_FILE="${KRNL_PKG}-${PKG_VRSN}-${SYS_ARCH}.pkg.tar.zst"
+        SRVR_OUT="$(/usr/bin/reflector -p rsync -c "${COUNTRY}" -l 10 -f 5 --sort rate)"
+        SRVR_LIN="$(echo "$SRVR_OUT" | /bin/grep '^Server' | /usr/bin/head -1)"
+        SRVR_STR="$(echo "$SRVR_LIN" | /usr/bin/rev | /usr/bin/cut -d\  -f1 | /usr/bin/cut -d/ -f 4- | /usr/bin/rev)"
+        echo " ${SRVR_STR}"
+
+        /usr/bin/printf "\033[1;34m::\033[97m Syncing %s...\033[0m\n" "${PKG_FILE}"
+        /usr/bin/sudo /usr/bin/rsync -PHAXax "${SRVR_STR}/pool/packages/${PKG_FILE}" /var/cache/pacman/pkg/
+
+        /usr/bin/printf "\033[1;34m::\033[97m Syncing %s...\033[0m\n" "${PKG_FILE}.sig"
+        /usr/bin/sudo /usr/bin/rsync -PHAXax "${SRVR_STR}/pool/packages/${PKG_FILE}.sig" /var/cache/pacman/pkg/
+        ;;
       updates) GET_PRIVILEGE && /usr/bin/sudo /usr/bin/pacman -Syuw --noconfirm;;
     esac
     ;;
