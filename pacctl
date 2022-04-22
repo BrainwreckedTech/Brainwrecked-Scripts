@@ -39,7 +39,7 @@ case "${1}" in
         /usr/bin/printf " %s\n" "${COUNTRY}"
 
         /usr/bin/printf "\033[1;34m::\033[97m Determining Best Mirror...\033[0m\n"
-        SRVR_OUT="$(/usr/bin/reflector -p rsync -c "${COUNTRY}" -l 10 -f 5 --sort rate)"
+        SRVR_OUT="$(/usr/bin/reflector -p rsync -c "${COUNTRY}" -l 10 -f 5 --sort rate -x arch.mirror.square-r00t.net)"
         SRVR_LIN="$(echo "$SRVR_OUT" | /bin/grep '^Server' | /usr/bin/head -1)"
         SRVR_STR="$(echo "$SRVR_LIN" | /usr/bin/rev | /usr/bin/cut -d\  -f1 | /usr/bin/cut -d/ -f 4- | /usr/bin/rev)"
 
