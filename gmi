@@ -34,7 +34,7 @@ fi
 
 if lscpu | grep "Model name" | grep -v 'BIOS Model name' | grep -q '@'; then
   SPD=$(lscpu | grep "Model name" | cut -d@ -f2 | sed 's/ \+//g')
-elif lscpu | grep "CPU max MHz"; then
+elif lscpu | grep -q "CPU max MHz"; then
   for MHZ in $(lscpu | grep "CPU max MHz" | cut -d: -f2 | cut -d. -f1 | sed 's/ \+//g'); do
     [ -n "${SPD}" ] && SPD+=" "
     SPD+="$((MHZ/1000)).$((((MHZ%1000)+5)/10))GHz"
