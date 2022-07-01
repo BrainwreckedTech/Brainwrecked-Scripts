@@ -32,13 +32,15 @@ else
   RAM=$(awk "BEGIN {print int ( $(vmstat -s | grep 'total memory' | cut -dK -f1 | sed 's/  *//g') / 1024 / 1024 * 100 + 0.5 ) / 100 }")
 fi
 
-if lscpu | grep "Model name" | grep -q '@'; then
+if lscpu | grep "Model name" | grep -v 'BIOS Model name' | grep -q '@'; then
   SPD=$(lscpu | grep "Model name" | cut -d@ -f2 | sed 's/ \+//g')
-else
+elif lscpu | grep "CPU max MHz"; then
   for MHZ in $(lscpu | grep "CPU max MHz" | cut -d: -f2 | cut -d. -f1 | sed 's/ \+//g'); do
     [ -n "${SPD}" ] && SPD+=" "
     SPD+="$((MHZ/1000)).$((((MHZ%1000)+5)/10))GHz"
   done
+else
+  SPD=$(lscpu | grep 'BIOS Model name' | cut -d@ -f2 | grep -P '[0-9\.GMHz]*')
 fi
 
 SPA=(${SPD})
