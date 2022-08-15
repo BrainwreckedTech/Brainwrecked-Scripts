@@ -15,43 +15,41 @@
 #	See <http://www.gnu.org/licenses/> for details.			#
 #########################################################################
 
-DMIDCBIN="$(command -v dmidecode)"
-
-if [ -n "${DMIDCBIN}" ] && sudo -n "${DMIDCBIN}" -t 17 > /dev/null 2>&1; then
-  RAM=$(awk "BEGIN {print ( $(sudo $(command -v dmidecode) -t 17 | grep 'Size:' | grep -v 'No Module Installed\|Volatile Size' | sed 's/\s\+//g' | cut -d: -f2 | tr '\n' '+' | sed 's/+$//g;s/GB/*2^20/g;s/MB/*2^10/g') ) / 2^20}" 2> /dev/null)
-  [ -z "${RAM}" ] && RAM=$(awk "BEGIN {print int ( $(vmstat -s | grep 'total memory' | cut -dK -f1 | sed 's/  *//g') / 1024 / 1024 * 100 + 0.5 ) / 100 }")
+if [ -e /usr/sbin/dmidecode ] && /usr/bin/sudo -n /usr/sbin/dmidecode -t 17 > /dev/null 2>&1; then
+  RAM=$(/usr/bin/awk "BEGIN {print ( $(/usr/bin/sudo /usr/sbin/dmidecode -t 17 | /bin/grep 'Size:' | /bin/grep -v 'No Module Installed\|Volatile Size' | /bin/sed 's/\s\+//g' | /usr/bin/cut -d: -f2 | /usr/bin/tr '\n' '+' | /bin/sed 's/+$//g;s/GB/*2^20/g;s/MB/*2^10/g') ) / 2^20}" 2> /dev/null)
+  [ -z "${RAM}" ] && RAM=$(/usr/bin/awk "BEGIN {print int ( $(/usr/bin/vmstat -s | /bin/grep 'total memory' | /usr/bin/cut -dK -f1 | /bin/sed 's/  *//g') / 1024 / 1024 * 100 + 0.5 ) / 100 }")
 elif [ -d "/sys/devices/system/memory" ]; then
   for MEMORIES in /sys/devices/system/memory/memory*; do
     if [[ $(< "${MEMORIES}/online") == 1 ]]; then
-      ((TOTALRAM+=0x$(cat /sys/devices/system/memory/block_size_bytes)))
+      ((TOTALRAM+=0x$(/bin/cat /sys/devices/system/memory/block_size_bytes)))
     fi
   done
-  RAM=$(awk "BEGIN {print ${TOTALRAM} / 1024 ^ 3}")
+  RAM=$(/usr/bin/awk "BEGIN {print ${TOTALRAM} / 1024 ^ 3}")
 else
-  grep -q ARMv /proc/cpuinfo || echo "Add '%$(id -g -n $(whoami)) ALL=(ALL) NOPASSWD:${DMIDCBIN} -t 17' with 'visudo' to get exact RAM capacity." > /dev/stderr
-  RAM=$(awk "BEGIN {print int ( $(vmstat -s | grep 'total memory' | cut -dK -f1 | sed 's/  *//g') / 1024 / 1024 * 100 + 0.5 ) / 100 }")
+  /bin/grep -q ARMv /proc/cpuinfo || echo "Add '%$(id -g -n $(/usr/bin/whoami)) ALL=(ALL) NOPASSWD:/usr/sbin/dmidecode -t 17' with 'visudo' to get exact RAM capacity." > /dev/stderr
+  RAM=$(/usr/bin/awk "BEGIN {print int ( $(/usr/bin/vmstat -s | /bin/grep 'total memory' | /usr/bin/cut -dK -f1 | /bin/sed 's/  *//g') / 1024 / 1024 * 100 + 0.5 ) / 100 }")
 fi
 
-if lscpu | grep "Model name" | grep -v 'BIOS Model name' | grep -q '@'; then
-  SPD=$(lscpu | grep "Model name" | cut -d@ -f2 | sed 's/ \+//g')
-elif lscpu | grep -q "CPU max MHz"; then
-  for MHZ in $(lscpu | grep "CPU max MHz" | cut -d: -f2 | cut -d. -f1 | sed 's/ \+//g'); do
+if /usr/bin/lscpu | /bin/grep "Model name" | /bin/grep -v 'BIOS Model name' | /bin/grep -q '@'; then
+  SPD=$(/usr/bin/lscpu | /bin/grep "Model name" | /usr/bin/cut -d@ -f2 | /bin/sed 's/ \+//g')
+elif /usr/bin/lscpu | /bin/grep -q "CPU max MHz"; then
+  for MHZ in $(/usr/bin/lscpu | /bin/grep "CPU max MHz" | /usr/bin/cut -d: -f2 | /usr/bin/cut -d. -f1 | /bin/sed 's/ \+//g'); do
     [ -n "${SPD}" ] && SPD+=" "
     SPD+="$((MHZ/1000)).$((((MHZ%1000)+5)/10))GHz"
   done
 else
-  SPD=$(lscpu | grep 'BIOS Model name' | cut -d@ -f2 | grep -P '[0-9\.GMHz]*')
+  SPD=$(/usr/bin/lscpu | /bin/grep 'BIOS Model name' | /usr/bin/cut -d@ -f2 | /bin/grep -P '[0-9\.GMHz]*')
 fi
 
 SPA=(${SPD})
 
-NOP=$(lscpu | grep -v 'BIOS' | grep -c 'Model name:')
-PCC=$(sort -u /proc/cpuinfo | grep -c '^core id')
+NOP=$(/usr/bin/lscpu | /bin/grep -v 'BIOS' | /bin/grep -c 'Model name:')
+PCC=$(/usr/bin/sort -u /proc/cpuinfo | /bin/grep -c '^core id')
 PCC=${PCC/0/1} # For ARM devices which don't report core ids
-LCC=$(cat /proc/cpuinfo | grep -c '^processor')
-DST="$(uname -m | sed 's/^x86_64$/x64v1/g;s/x86_64-v/x64/g') $(cat /etc/os-release | grep PRETTY_NAME | cut -d\" -f2)"
-PVN="$(lscpu | grep '^Vendor ID:' | sed 's/\s//g' | cut -d: -f2 | sed 's/\(Genuine\|Authentic\|ARM\)//g')"
-PMN="$(lscpu | grep '^Model name' | sed 's/:\s\s*/:/g' | cut -d: -f2 | sed 's/\s/ /g')"
+LCC=$(/bin/grep -c '^processor' /proc/cpuinfo)
+DST="$(/bin/uname -m | /bin/sed 's/^x86_64$/x64v1/g;s/x86_64-v/x64/g') $(/bin/grep PRETTY_NAME /etc/os-release | /usr/bin/cut -d\" -f2)"
+PVN="$(/usr/bin/lscpu | /bin/grep '^Vendor ID:' | /bin/sed 's/\s//g' | /usr/bin/cut -d: -f2 | /bin/sed 's/\(Genuine\|Authentic\|ARM\)//g')"
+PMN="$(/usr/bin/lscpu | /bin/grep '^Model name' | /bin/sed 's/:\s\s*/:/g' | /usr/bin/cut -d: -f2 | /bin/sed 's/\s/ /g')"
 PMN="${PMN//\([Tt][Mm]\)/}"	# Remove (TM)
 PMN="${PMN//\([Rr]\)/}"		# Remove (R)
 PMN="${PMN/AMD?/}"		# Remove AMD (already specified in vendor string)
@@ -89,7 +87,7 @@ PMN="${PMN// /_}"
 PMA=(${PMN/$'\n'/ })
 
 set -e
-flags=$(grep '^flags\b' < /proc/cpuinfo | head -n 1)
+flags=$(/bin/grep '^flags\b' < /proc/cpuinfo | /usr/bin/head -n 1)
 flags=" ${flags#*:} "
 
 ckflags() {
@@ -111,7 +109,7 @@ ckflags avx512f avx512bw avx512cd avx512dq avx512vl && PAT=x64v4
 set +e
 
 if [ -z "${PAT}" ]; then
-  PAT="$(gcc -c -Q -march=native --help=target | grep 'march= ' | sed 's/.*=\s*//;s/+.*//;s/-//g;s/arm/ARM/')"
+  PAT="$(/usr/bin/gcc -c -Q -march=native --help=target | /bin/grep 'march= ' | /bin/sed 's/.*=\s*//;s/+.*//;s/-//g;s/arm/ARM/')"
 fi
 
 if type Xorg &> /dev/null; then
@@ -135,9 +133,9 @@ else
   DTE="CLI"
 fi
 
-printf '%s %s'  "${PAT}" "${PVN}${PVN//[A-Za-z]*/ }"
+/usr/bin/printf '%s %s'  "${PAT}" "${PVN}${PVN//[A-Za-z]*/ }"
 for (( LC=0 ; LC < ${#PMA[@]} ; LC++ )); do
-  [ ${LC} -gt 0 ] && printf ' + '
-  printf '%s %s' "${PMA[${LC}]//_/ }" "${SPA[${LC}]}"
+  [ ${LC} -gt 0 ] && /usr/bin/printf ' + '
+  /usr/bin/printf '%s %s' "${PMA[${LC}]//_/ }" "${SPA[${LC}]}"
 done
 echo " $((PCC*NOP))c/${LCC}t ${CPU} with ${RAM}GB RAM running ${DST} ${DTE}"
