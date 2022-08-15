@@ -45,7 +45,7 @@ fi
 
 SPA=(${SPD})
 
-NOP=$(lscpu | grep -c 'Model name:')
+NOP=$(lscpu | grep -v 'BIOS' | grep -c 'Model name:')
 PCC=$(sort -u /proc/cpuinfo | grep -c '^core id')
 PCC=${PCC/0/1} # For ARM devices which don't report core ids
 LCC=$(cat /proc/cpuinfo | grep -c '^processor')
