@@ -110,6 +110,11 @@ case "${1}" in
   up|upd|updt|update)
     case "${2}" in
       ignored) /usr/bin/pacman -S --needed --noconfirm "$(/bin/grep '^IgnorePkg' /etc/pacman.conf | /bin/sed 's/.*= //g')";;
+      keys)
+        GET_PRIVILEGE || exit 1
+        /usr/bin/sudo /usr/bin/pacman -Sy --needed --noconfirm archlinux-keyring
+        /usr/bin/pacman -Qi chaotic-keyring > /dev/null 2>&1 && /usr/bin/sudo /usr/bin/pacman -S --needed --noconfirm chaotic-keyring
+      ;;
       zfs)
         GET_PRIVILEGE || exit 1
         /usr/bin/sudo /usr/bin/pacman -Sy || exit 2
@@ -176,11 +181,7 @@ case "${1}" in
         /bin/grep '^Server' /etc/pacman.d/mirrorlist | /bin/sed 's/\(.*\)/ \1/g'
       ;;
       repos) GET_PRIVILEGE && /usr/bin/sudo /usr/bin/pacman -Sy;;
-      system)
-        GET_PRIVILEGE
-        /usr/bin/sudo /usr/bin/pacman -Sy --needed --noconfirm archlinux-keyring
-        /usr/bin/pacman -Qi chaotic-keyring > /dev/null 2>&1 && /usr/bin/sudo /usr/bin/pacman -S --needed --noconfirm chaotic-keyring
-        /usr/bin/sudo /usr/bin/pacman -Su;;
+      system) GET_PRIVILEGE && /usr/bin/sudo /usr/bin/pacman -Su;;
     esac
   ;;
 esac
