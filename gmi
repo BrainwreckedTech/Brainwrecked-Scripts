@@ -72,9 +72,9 @@ shopt -u extglob
 
 CPU=CPU
 
-if [[ ${PMN} = *"with Radeon HD Graphics"* ]]; then
+if [[ ${PMN} = *"with Radeon "*"Graphics"* ]]; then
   CPU=APU
-  PMN="${PMN/ with Radeon HD Graphics/}"
+  PMN="${PMN/ with Radeon *Graphics/}"
 elif [[ ${PMN} = *"RADEON R"*"COMPUTE CORES"* ]]; then
   CPU=APU
   PMN="${PMN/ RADEON R*COMPUTE CORES*/}"
