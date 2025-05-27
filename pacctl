@@ -173,7 +173,7 @@ case "${1}" in
           COUNTRY="${3}"
         else
           /usr/bin/printf "\033[1;34m::\033[97m Geolocating county...\033[0m\n"
-          COUNTRY="$(/usr/bin/curl -s ${GEOIPURL} | /usr/bin/tr ',' '\n' | /bin/grep country_code | /bin/sed 's/^.*:"//;s/"$//')"
+          COUNTRY="$(/usr/bin/curl -s "${GEOIPURL}" | /usr/bin/tr ',' '\n' | /bin/grep country_code | /bin/sed 's/^.*:"//;s/"$//')"
         fi
 
         /usr/bin/printf " %s\n" "${COUNTRY}"
