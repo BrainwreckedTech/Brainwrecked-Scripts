@@ -112,8 +112,11 @@ case "${1}" in
       ignored) /usr/bin/pacman -S --needed --noconfirm "$(/bin/grep '^IgnorePkg' /etc/pacman.conf | /bin/sed 's/.*= //g')";;
       keys)
         GET_PRIVILEGE || exit 1
-        /usr/bin/sudo /usr/bin/pacman -Sy --needed --noconfirm archlinux-keyring
-        /usr/bin/pacman -Qi chaotic-keyring > /dev/null 2>&1 && /usr/bin/sudo /usr/bin/pacman -S --needed --noconfirm chaotic-keyring
+        for KEYRING in $(basename -s .gpg -a $(ls /usr/share/pacman/keyrings/*.gpg)); do
+          if /usr/bin/pacman -Qi "${KEYRING}-keyring"  > /dev/null 2> /dev/null; then
+            /usr/bin/sudo /usr/bin/pacman -Sy --needed --noconfirm "${KEYRING}-keyring"
+          fi
+        done
       ;;
       zfs)
         GET_PRIVILEGE || exit 1
