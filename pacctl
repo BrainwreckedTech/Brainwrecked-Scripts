@@ -64,6 +64,8 @@ case "${1}" in
     THINK_ABOUT() {
       CATEGORY="${1}"
       shift
+      # shellcheck disable=SC2068
+      # No package name has a space in it
       for PACKAGE in ${@}; do
         /usr/bin/printf '\033[2K\rThinking about %s:%s' "${CATEGORY}" "${PACKAGE}" > /dev/stderr
         /usr/bin/pactree -ul "${PACKAGE}" > /dev/null 2>&1 && OPTS=ul || OPTS=sul
@@ -80,15 +82,35 @@ case "${1}" in
     }
 
     case "${2}" in
-      base) /usr/bin/pactree -ul base | /usr/bin/sort | /usr/bin/tr '\n' ' ';;
-      base-devel) THINK_ABOUT base-devel $(/usr/bin/pacman -Sgq base-devel | /usr/bin/sort | /usr/bin/tr '\n' ' ');;
-      base-extra) THINK_ABOUT base-extra linux linux-headers linux-hardened linux-hardened-headers linux-lts linux-lts-headers linux-zen-headers linux-firmware grub refind syslinux nano vim sudo;;
-      core) THINK_ABOUT core $(/usr/bin/pacman -Slq core | /usr/bin/sort | /usr/bin/tr '\n' ' ');;
+      base)
+        # shellcheck disable=SC2046
+        # Word splitting is desired
+        /usr/bin/pactree -ul base | /usr/bin/sort | /usr/bin/tr '\n' ' '
+        ;;
+      base-devel)
+        # shellcheck disable=SC2046
+        # Word splitting is desired
+        THINK_ABOUT base-devel $(/usr/bin/pacman -Sgq base-devel | /usr/bin/sort | /usr/bin/tr '\n' ' ')
+        ;;
+      base-extra)
+        # shellcheck disable=SC2046
+        # Word splitting is desired
+        THINK_ABOUT base-extra linux linux-headers linux-hardened linux-hardened-headers linux-lts linux-lts-headers linux-zen-headers linux-firmware grub refind syslinux nano vim sudo
+        ;;
+      core)
+        # shellcheck disable=SC2046
+        # Word splitting is desired
+        THINK_ABOUT core $(/usr/bin/pacman -Slq core | /usr/bin/sort | /usr/bin/tr '\n' ' ')
+        ;;
       expanded-base) /usr/bin/printf '%s\n%s\n%s\n' "$("${0}" list base | /usr/bin/tr ' ' '\n')"p "$("${0}" list base-devel | /usr/bin/tr ' ' '\n')" "$("${0}" list base-extra | /usr/bin/tr ' ' '\n')" | /usr/bin/sort -u | /usr/bin/tr '\n' ' '; echo;;
       explicit) /usr/bin/pacman -Qenq | /usr/bin/sort | /usr/bin/tr '\n' ' ';;
       modded-configs) /usr/bin/pacman -Qii | /bin/grep '^MODIFIED' | /bin/sed 's/MODIFIED\t//g' ;;
       repo) /usr/bin/pacman -Slq "${3}" | /usr/bin/sort | /usr/bin/tr '\n' ' ';;
-      xorg) THINK_ABOUT xorg $(/usr/bin/pacman -Sgq xorg | /usr/bin/sort | /usr/bin/tr '\n' ' ');;
+      xorg)
+        # shellcheck disable=SC2046
+        # Word splitting is desired
+        THINK_ABOUT xorg $(/usr/bin/pacman -Sgq xorg | /usr/bin/sort | /usr/bin/tr '\n' ' ')
+        ;;
     esac
   ;;
   rm|rem|remove)
@@ -97,12 +119,29 @@ case "${1}" in
     COMPARETO="$(mktemp)"
     GET_PRIVILEGE || exit 1
     case "${2}" in
-      all-but-base) "${0}" list expanded-base | /usr/bin/tr ' ' '\n' | /usr/bin/sort > "${COMPARETO}"; /usr/bin/sudo /usr/bin/pacman -R $(/usr/bin/comm -23 "${INSTALLED}" "${COMPARETO}");;
-      all-but-core) "${0}" list core | /usr/bin/tr ' ' '\n' | /usr/bin/sort > "${COMPARETO}"; /usr/bin/sudo /usr/bin/pacman -R $(/usr/bin/comm -23 "${INSTALLED}" "${COMPARETO}");;
-      all-but-xorg) echo "$("${0}" list xorg | /usr/bin/tr ' ' '\n')${NEWLINE}$("${0}" list core | /usr/bin/tr ' ' '\n')" | /usr/bin/sort -u > "${COMPARETO}"; /usr/bin/sudo /usr/bin/pacman -R $(/usr/bin/comm -23 "${INSTALLED}" "${COMPARETO}");;
+      all-but-base)
+        "${0}" list expanded-base | /usr/bin/tr ' ' '\n' | /usr/bin/sort > "${COMPARETO}"
+        # shellcheck disable=SC2046
+        # Word splitting is desired
+        /usr/bin/sudo /usr/bin/pacman -R $(/usr/bin/comm -23 "${INSTALLED}" "${COMPARETO}")
+        ;;
+      all-but-core)
+        "${0}" list core | /usr/bin/tr ' ' '\n' | /usr/bin/sort > "${COMPARETO}"
+        # shellcheck disable=SC2046
+        # Word splitting is desired
+        /usr/bin/sudo /usr/bin/pacman -R $(/usr/bin/comm -23 "${INSTALLED}" "${COMPARETO}")
+        ;;
+      all-but-xorg)
+        echo "$("${0}" list xorg | /usr/bin/tr ' ' '\n')${NEWLINE}$("${0}" list core | /usr/bin/tr ' ' '\n')" | /usr/bin/sort -u > "${COMPARETO}"
+        # shellcheck disable=SC2046
+        # Word splitting is desired
+        /usr/bin/sudo /usr/bin/pacman -R $(/usr/bin/comm -23 "${INSTALLED}" "${COMPARETO}")
+        ;;
       orphans)
         PKG_LIST="$(/usr/bin/pacman -Qtqd 2> /dev/null)"
         [ -z "${PKG_LIST}" ] && echo "No orphaned packages found." && exit 0
+        # shellcheck disable=SC2086
+        # Word splitting is desired
         /usr/bin/sudo /usr/bin/pacman -Rnsc ${PKG_LIST}
         ;;
     esac
@@ -112,6 +151,8 @@ case "${1}" in
       ignored) /usr/bin/pacman -S --needed --noconfirm "$(/bin/grep '^IgnorePkg' /etc/pacman.conf | /bin/sed 's/.*= //g')";;
       keys)
         GET_PRIVILEGE || exit 1
+        # shellcheck disable=SC2046
+        # Word splitting is desired
         for KEYRING in $(basename -s .gpg -a $(ls /usr/share/pacman/keyrings/*.gpg)); do
           if /usr/bin/pacman -Qi "${KEYRING}-keyring"  > /dev/null 2> /dev/null; then
             /usr/bin/sudo /usr/bin/pacman -Sy --needed --noconfirm "${KEYRING}-keyring"
@@ -122,6 +163,7 @@ case "${1}" in
         GET_PRIVILEGE || exit 1
         /usr/bin/sudo /usr/bin/pacman -Sy || exit 2
         VERSION_LESSTHAN() {
+          # shellcheck disable=SC2015
           [ "${1}" != "${2}" ] && true || false
         }
         /usr/bin/printf "\033[1;34m::\033[97m ZFS Kernel Information:\033[0m\n"
