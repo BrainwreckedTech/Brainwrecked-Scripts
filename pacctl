@@ -136,7 +136,7 @@ case "${1}" in
         ZFS_KERNEL_VER="$(/usr/bin/pacman -Si "zfs-${INSTALLED_KERNEL}/${INSTALLED_KERNEL}" | /bin/grep 'Version' | /bin/sed 's/.*: //g')"
         ZFS_MODULE_VER="$(/usr/bin/pacman -Si "archzfs/zfs-${INSTALLED_KERNEL}" | /bin/grep 'Version' | /bin/sed 's/.*: //g')"
         ZFS_MOD_CORVER="$(/usr/bin/pacman -Si "zfs-${INSTALLED_KERNEL}" | /bin/grep 'Depends' | /usr/bin/tr ' ' '\n' | /bin/grep "${INSTALLED_KERNEL}" | cut -d= -f2)"
-        ZFS_UTILS_VRSN="$(/usr/bin/pacman -Si "zfs-utils" | /bin/grep 'Version' | /bin/sed 's/ //g' | cut -d: -f2)"
+        ZFS_UTILS_VRSN="$(/usr/bin/pacman -Si "zfs-utils" | /bin/grep 'Version' | /bin/sed 's/ //g' | cut -d: -f2 | head -1)"
         /usr/bin/printf '%-30s%-30s\n'   " local/${INSTALLED_KERNEL}"                   "${LOCAL_KERNEL_VER}"
         /usr/bin/printf '%-30s%-30s\n'   " ${OFFICIAL_REPO}/${INSTALLED_KERNEL}"        "${REPO_KERNEL_VER}"
         /usr/bin/printf '%-30s%-30s\n'   " zfs-${INSTALLED_KERNEL}/${INSTALLED_KERNEL}" "${ZFS_KERNEL_VER}"
