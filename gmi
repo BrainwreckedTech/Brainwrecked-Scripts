@@ -16,7 +16,7 @@
 #########################################################################
 
 if [ -e /usr/sbin/dmidecode ] && /usr/bin/sudo -n /usr/sbin/dmidecode -t 17 > /dev/null 2>&1; then
-  RAM=$(/usr/bin/awk "BEGIN {print ( $(/usr/bin/sudo /usr/sbin/dmidecode -t 17 | /bin/grep 'Size:' | /bin/grep -v 'No Module Installed\|Volatile Size' | /bin/sed 's/\s\+//g' | /usr/bin/cut -d: -f2 | /usr/bin/tr '\n' '+' | /bin/sed 's/+$//g;s/GB/*2^20/g;s/MB/*2^10/g') ) / 2^20}" 2> /dev/null)
+  RAM=$(/usr/bin/awk "BEGIN {print ( $(/usr/bin/sudo /usr/sbin/dmidecode -t 17 | /bin/grep 'Size:' | /bin/grep -v 'No Module Installed\|Volatile Size' | /bin/sed 's/\s\+//g' | /usr/bin/cut -d: -f2 | /usr/bin/tr '\n' '+' | /bin/sed 's/+$//g;s/GiB/*2^20/g;s/MiB/*2^10/g') ) / 2^20}" 2> /dev/null)
   [ -z "${RAM}" ] && RAM=$(/usr/bin/awk "BEGIN {print int ( $(/usr/bin/vmstat -s | /bin/grep 'total memory' | /usr/bin/cut -dK -f1 | /bin/sed 's/  *//g') / 1024 / 1024 * 100 + 0.5 ) / 100 }")
 elif [ -d "/sys/devices/system/memory" ]; then
   for MEMORIES in /sys/devices/system/memory/memory*; do
